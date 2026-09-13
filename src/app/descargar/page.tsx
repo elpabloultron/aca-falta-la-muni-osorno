@@ -38,6 +38,7 @@ import {
 } from '@/components/Badges/OfficialStoreBadges';
 
 export default function DescargarPage() {
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH || '';
   const [activeTab, setActiveTab] = useState<'android' | 'ios' | 'pc'>('android');
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstalled, setIsInstalled] = useState(false);
@@ -211,8 +212,8 @@ export default function DescargarPage() {
               <div className="relative w-[280px] sm:w-[320px] aspect-[9/16] bg-black rounded-[40px] border-4 border-neutral-700 shadow-2xl overflow-hidden p-1.5">
                 <div className="w-full h-full rounded-[32px] overflow-hidden bg-[#121214]">
                   <video
-                    src="/tutorial/tutorial_como_denunciar_osorno.mp4"
-                    poster="/tutorial/instagram_tutorial_slide_1.png"
+                    src={`${basePath}/tutorial/tutorial_como_denunciar_osorno.mp4`}
+                    poster={`${basePath}/tutorial/instagram_tutorial_slide_1.png`}
                     controls
                     loop
                     playsInline
@@ -274,7 +275,7 @@ export default function DescargarPage() {
 
               <div className="pt-2">
                 <a
-                  href="/tutorial/tutorial_como_denunciar_osorno.mp4"
+                  href={`${basePath}/tutorial/tutorial_como_denunciar_osorno.mp4`}
                   download="tutorial_como_denunciar_osorno.mp4"
                   className="inline-flex items-center gap-2 text-xs font-bold text-[#F4CA19] hover:underline"
                 >
@@ -808,7 +809,7 @@ export default function DescargarPage() {
               <ExternalLink className="w-3 h-3 inline" />
             </a>
             <span>•</span>
-            <a href="/tutorial/tutorial_como_denunciar_osorno.mp4" download className="hover:underline">
+            <a href={`${basePath}/tutorial/tutorial_como_denunciar_osorno.mp4`} download className="hover:underline">
               Video Tutorial
             </a>
           </div>
