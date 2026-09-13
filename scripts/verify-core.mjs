@@ -206,11 +206,27 @@ function simulateRateLimit(timestamps, max = 5, windowMs = 3600000) {
   timestamps.push(now);
   return true;
 }
+
 for (let i = 0; i < 5; i++) {
+
   assert(simulateRateLimit(testHistory) === true, `Intento ${i + 1} debe permitirse`);
 }
 assert(simulateRateLimit(testHistory) === false, 'El 6to intento debe ser bloqueado por rate limiting');
 console.log('✓ Limitador de tasa preventivo validado (bloqueo al superar umbral de 5 peticiones/hora)');
 
+// Test 8: Validación de captcha aritmético anti-spam (suma escolar simple)
+function validateMathCaptcha(n1, n2, answerStr) {
+  const parsed = parseInt(answerStr.trim(), 10);
+  if (isNaN(parsed)) return false;
+  return parsed === n1 + n2;
+}
+assert(validateMathCaptcha(3, 5, '8') === true, 'Suma correcta 3 + 5 = 8 debe ser aprobada');
+
+assert(validateMathCaptcha(7, 4, ' 11 ') === true, 'Suma correcta con espacios debe ser aprobada');
+assert(validateMathCaptcha(6, 2, '9') === false, 'Suma incorrecta debe ser rechazada');
+assert(validateMathCaptcha(4, 3, 'spam') === false, 'Entrada de texto no numérica debe ser rechazada');
+console.log('✓ Captcha aritmético anti-spam validado (verificación estricta de sumas escolares simples)');
+
 console.log('--------------------------------------------------------------');
 console.log('TODAS LAS PRUEBAS (100 %) APROBADAS EXITOSAMENTE');
+

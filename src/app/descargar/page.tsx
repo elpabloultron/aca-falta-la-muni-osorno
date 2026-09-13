@@ -31,10 +31,6 @@ import {
   GitHubBadge,
   FDroidBadge,
   ObtainiumBadge,
-  SamsungGalaxyStoreBadge,
-  HuaweiAppGalleryBadge,
-  GooglePlayBadge,
-  AppleAppStoreBadge,
 } from '@/components/Badges/OfficialStoreBadges';
 
 export default function DescargarPage() {
@@ -166,13 +162,11 @@ export default function DescargarPage() {
             </a>
           </div>
 
-          {/* Fila rápida de acceso a tiendas en Hero */}
+          {/* Fila rápida de acceso Open Source (GitHub, Obtainium y F-Droid) */}
           <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5">
             <GitHubBadge />
             <ObtainiumBadge />
             <FDroidBadge />
-            <SamsungGalaxyStoreBadge />
-            <HuaweiAppGalleryBadge />
           </div>
 
           <div className="pt-4 flex items-center justify-center gap-6 text-xs text-neutral-400">
@@ -461,32 +455,32 @@ export default function DescargarPage() {
         </div>
       </section>
 
-      {/* 5. Tiendas de Aplicaciones, Ecosistema Open Source y Descargas */}
+      {/* 5. Ecosistema 100 % Open Source y Distribución Libre */}
       <section id="tiendas" className="px-4 sm:px-8 py-16 bg-[#131316] border-t border-white/5">
         <div className="max-w-5xl mx-auto space-y-10">
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#F4CA19] uppercase tracking-wider">
-              <Package className="w-4 h-4" />
-              <span>Ecosistema Abierto y Tiendas</span>
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#F4CA19] uppercase tracking-wider bg-[#F4CA19]/10 px-3 py-1 rounded-full border border-[#F4CA19]/30">
+              <Code2 className="w-4 h-4" />
+              <span>Proyecto 100 % Open Source y Libre</span>
             </div>
             <h2 className="text-2xl sm:text-4xl font-black tracking-tight text-white">
-              Descargas y Tiendas Oficiales
+              Descargas Libres: GitHub, Obtainium y F-Droid
             </h2>
             <p className="text-neutral-400 text-xs sm:text-sm leading-relaxed">
-              Elige tu canal preferido: descarga libre de código abierto, repositorios comunitarios independientes o tiendas oficiales de fabricantes.
+              Sin tiendas comerciales cerradas ni rastreo publicitario. Descarga la aplicación de forma libre, auditable y directa mediante repositorios abiertos comunitarios.
             </p>
           </div>
 
-          {/* Fila de Insignias Oficiales de Tiendas */}
+          {/* Fila de Insignias Oficiales Open Source */}
           <div className="bg-[#18181D]/80 border border-white/10 rounded-3xl p-5 sm:p-7 backdrop-blur-sm space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-4">
               <div>
                 <h3 className="text-white font-black text-base sm:text-lg flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-[#F4CA19]" />
-                  <span>Descarga Directa en 1 Clic e Insignias Oficiales</span>
+                  <span>Canales Libres de Distribución e Instalación</span>
                 </h3>
                 <p className="text-neutral-400 text-xs mt-0.5">
-                  Toca la insignia oficial de tu tienda o sistema para acceder a la descarga de la app nativa
+                  Selecciona tu método preferido de código abierto para instalar o actualizar la aplicación
                 </p>
               </div>
               <span className="text-[11px] font-mono bg-[#F4CA19]/10 text-[#F4CA19] font-bold px-2.5 py-1 rounded-full border border-[#F4CA19]/30 self-start sm:self-auto">
@@ -498,15 +492,11 @@ export default function DescargarPage() {
               <GitHubBadge />
               <ObtainiumBadge />
               <FDroidBadge />
-              <SamsungGalaxyStoreBadge />
-              <HuaweiAppGalleryBadge />
-              <GooglePlayBadge isUpcoming={true} />
-              <AppleAppStoreBadge isUpcoming={true} />
             </div>
           </div>
 
-          {/* Cuadrícula de Canales y Tiendas */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {/* Cuadrícula de Canales Open Source (3 Columnas) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {/* 1. GitHub Releases & APK Directo */}
             <div className="bg-[#18181D] border border-white/10 rounded-2xl p-5 flex flex-col justify-between hover:border-[#F4CA19]/40 transition-colors shadow-lg group">
               <div className="space-y-3">
@@ -523,19 +513,19 @@ export default function DescargarPage() {
                     GitHub Releases (APK)
                   </h3>
                   <p className="text-neutral-400 text-xs mt-1.5 leading-relaxed">
-                    Descarga directa del paquete APK oficial compilado desde el repositorio público. Código 100 % auditable, sin rastreadores ni publicidad.
+                    Descarga directa del paquete APK firmado oficial, compilado directamente desde el repositorio público. Código 100 % auditable, sin rastreadores ni publicidad.
                   </p>
                 </div>
               </div>
               <div className="pt-5 mt-4 border-t border-white/5 flex flex-col gap-2.5">
                 <GitHubBadge />
                 <a
-                  href="https://github.com/elpabloultron/aca-falta-la-muni-osorno"
+                  href="https://github.com/elpabloultron/aca-falta-la-muni-osorno/releases"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-center text-[11px] text-neutral-400 hover:text-white hover:underline transition-colors"
                 >
-                  Ver código fuente y Releases en GitHub →
+                  Ver Releases y notas de versión en GitHub →
                 </a>
               </div>
             </div>
@@ -556,7 +546,7 @@ export default function DescargarPage() {
                     Obtainium (Android)
                   </h3>
                   <p className="text-neutral-400 text-xs mt-1.5 leading-relaxed">
-                    Instala la app directamente desde GitHub y recibe actualizaciones automáticas en 1 toque en tu teléfono, sin pasar por Google ni tiendas comerciales.
+                    Instala la app directamente desde GitHub y recibe avisos de actualización en 1 toque en tu teléfono Android, sin pasar por Google ni tiendas propietarias.
                   </p>
                 </div>
               </div>
@@ -568,7 +558,7 @@ export default function DescargarPage() {
                   rel="noopener noreferrer"
                   className="text-center text-[11px] text-neutral-400 hover:text-white hover:underline transition-colors"
                 >
-                  ¿Qué es Obtainium? Descargar app →
+                  ¿Qué es Obtainium? Descargar gestor libre →
                 </a>
               </div>
             </div>
@@ -586,10 +576,10 @@ export default function DescargarPage() {
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-white group-hover:text-blue-300 transition-colors">
-                    F-Droid
+                    F-Droid (Android)
                   </h3>
                   <p className="text-neutral-400 text-xs mt-1.5 leading-relaxed">
-                    El repositorio de software libre más respetado para Android. Cero publicidad, cero librerías de rastreo y compilación independiente.
+                    El repositorio de software libre más respetado para Android. Cero librerías de seguimiento privativo, total privacidad y metadatos F-Droid configurados.
                   </p>
                 </div>
               </div>
@@ -605,124 +595,81 @@ export default function DescargarPage() {
                 </a>
               </div>
             </div>
+          </div>
 
-            {/* 4. Samsung Galaxy Store */}
-            <div className="bg-[#18181D] border border-white/10 rounded-2xl p-5 flex flex-col justify-between hover:border-cyan-500/40 transition-colors shadow-lg group">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-black">
-                    <Smartphone className="w-5 h-5 text-cyan-400" />
-                  </div>
-                  <span className="text-[10px] font-bold bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-full border border-cyan-500/30">
-                    Para Samsung
+          {/* Gran Banner Oficial de GitHub y Proyecto Open Source */}
+          <div className="relative overflow-hidden bg-gradient-to-br from-neutral-900 via-[#16161B] to-neutral-900 border-2 border-[#F4CA19]/40 rounded-3xl p-6 sm:p-10 shadow-2xl">
+            <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-80 h-80 bg-[#F4CA19]/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+              <div className="space-y-4 text-center lg:text-left max-w-2xl">
+                <div className="inline-flex items-center gap-2 bg-[#F4CA19]/15 border border-[#F4CA19]/40 text-[#F4CA19] text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full">
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                  </svg>
+                  <span>Proyecto Comunitario en GitHub</span>
+                </div>
+
+                <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight">
+                  ¡Visita el repositorio oficial y apóyanos con una estrella en GitHub!
+                </h3>
+
+                <p className="text-neutral-300 text-xs sm:text-sm leading-relaxed">
+                  «Acá Falta la Muni — Osorno» es una iniciativa 100 % independiente y de código abierto (licencia libre AGPL-3.0). El código fuente es público y auditable: cualquier vecino o desarrollador puede revisarlo, clonarlo, reportar problemas o proponer mejoras para la comuna.
+                </p>
+
+                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-1 text-xs">
+                  <span className="bg-black/60 border border-white/10 px-3 py-1 rounded-xl text-neutral-300 font-mono flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                    github.com/elpabloultron/aca-falta-la-muni-osorno
+                  </span>
+                  <span className="bg-white/10 px-2.5 py-1 rounded-xl text-neutral-300 font-semibold">
+                    Licencia AGPL-3.0
+                  </span>
+                  <span className="bg-white/10 px-2.5 py-1 rounded-xl text-neutral-300 font-semibold">
+                    0 % Rastreadores
                   </span>
                 </div>
-                <div>
-                  <h3 className="text-base font-bold text-white group-hover:text-cyan-300 transition-colors">
-                    Samsung Galaxy Store
-                  </h3>
-                  <p className="text-neutral-400 text-xs mt-1.5 leading-relaxed">
-                    Preinstalada de fábrica en todos los teléfonos inteligentes Samsung de Osorno. Instalación nativa sin requerir cuentas de Google.
-                  </p>
-                </div>
               </div>
-              <div className="pt-5 mt-4 border-t border-white/5 flex flex-col gap-2.5">
-                <SamsungGalaxyStoreBadge />
-                <span className="text-center text-[11px] text-neutral-400">
-                  Abre la tienda oficial Galaxy Store en tu Samsung
-                </span>
-              </div>
-            </div>
 
-            {/* 5. Huawei AppGallery */}
-            <div className="bg-[#18181D] border border-white/10 rounded-2xl p-5 flex flex-col justify-between hover:border-red-500/40 transition-colors shadow-lg group">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center font-black">
-                    <Smartphone className="w-5 h-5 text-red-400" />
-                  </div>
-                  <span className="text-[10px] font-bold bg-red-500/20 text-red-300 px-2 py-0.5 rounded-full border border-red-500/30">
-                    Para Huawei
-                  </span>
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-white group-hover:text-red-300 transition-colors">
-                    Huawei AppGallery
-                  </h3>
-                  <p className="text-neutral-400 text-xs mt-1.5 leading-relaxed">
-                    Especialmente diseñada para vecinas y vecinos con teléfonos Huawei que no cuentan con los servicios de Google Play.
-                  </p>
-                </div>
-              </div>
-              <div className="pt-5 mt-4 border-t border-white/5 flex flex-col gap-2.5">
-                <HuaweiAppGalleryBadge />
-                <span className="text-center text-[11px] text-neutral-400">
-                  Abre la tienda oficial AppGallery en tu Huawei
-                </span>
-              </div>
-            </div>
-
-            {/* 6. Google Play Store & Apple App Store (Próximamente) */}
-            <div className="bg-[#18181D] border border-white/10 rounded-2xl p-5 flex flex-col justify-between hover:border-amber-500/40 transition-colors shadow-lg group">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center font-black">
-                    <Play className="w-5 h-5 text-amber-400" />
-                  </div>
-                  <span className="text-[10px] font-bold bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-500/30">
-                    Tiendas Globales
-                  </span>
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-white group-hover:text-amber-300 transition-colors">
-                    Google Play & App Store
-                  </h3>
-                  <p className="text-neutral-400 text-xs mt-1.5 leading-relaxed">
-                    En fase de preparación y pruebas comunitarias para publicación abierta en Google Play Store (Android) y App Store (Apple).
-                  </p>
-                </div>
-              </div>
-              <div className="pt-5 mt-4 border-t border-white/5 flex flex-col gap-2.5">
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <GooglePlayBadge isUpcoming={true} />
-                  <AppleAppStoreBadge isUpcoming={true} />
-                </div>
+              {/* Botones de Acción del Banner */}
+              <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto shrink-0">
                 <a
-                  href="#instalar"
-                  className="block text-center text-[11px] text-[#F4CA19] hover:underline pt-1"
+                  href="https://github.com/elpabloultron/aca-falta-la-muni-osorno"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-6 py-3.5 rounded-2xl bg-[#F4CA19] hover:bg-[#ffe14d] text-black font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xl shadow-yellow-500/20 transition-all cursor-pointer active:scale-95 text-center"
                 >
-                  ¡Instala hoy gratis en tu celular con la PWA! ↑
+                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                  </svg>
+                  <span>Visitar Proyecto en GitHub ⭐</span>
+                </a>
+
+                <a
+                  href="https://github.com/elpabloultron/aca-falta-la-muni-osorno/releases"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-5 py-3 rounded-2xl bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs flex items-center justify-center gap-2 border border-white/10 transition-all cursor-pointer text-center"
+                >
+                  <Package className="w-4 h-4 text-[#F4CA19]" />
+                  <span>Ver Releases y Descargar APK</span>
+                </a>
+
+                <a
+                  href="https://github.com/elpabloultron/aca-falta-la-muni-osorno/issues"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-5 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer text-center"
+                >
+                  <Code2 className="w-3.5 h-3.5 text-[#F4CA19]" />
+                  <span>Aportar Código o Reportar Fallos</span>
                 </a>
               </div>
             </div>
           </div>
-
-          {/* Banner de Compromiso de Software Libre */}
-          <div className="bg-neutral-900/80 border border-white/10 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-5">
-            <div className="space-y-1.5 text-center sm:text-left">
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#F4CA19]">
-                <Code2 className="w-4 h-4" />
-                <span>Transparencia Cívica y Neutralidad</span>
-              </div>
-              <h3 className="text-lg font-bold text-white">
-                Software 100 % Libre y Comunitario
-              </h3>
-              <p className="text-neutral-400 text-xs max-w-2xl leading-relaxed">
-                El código de «Acá Falta la Muni — Osorno» es de código abierto. Cualquier vecino, estudiante de informática o junta de vecinos puede auditarlo, mejorarlo o replicarlo libremente.
-              </p>
-            </div>
-            <a
-              href="https://github.com/elpabloultron/aca-falta-la-muni-osorno"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-2 transition-colors shrink-0 border border-white/10 cursor-pointer"
-            >
-              <Code2 className="w-4 h-4 text-[#F4CA19]" />
-              <span>Ver en GitHub</span>
-            </a>
-          </div>
         </div>
       </section>
+
 
       {/* 6. Características Principales de Fiscalización */}
       <section className="px-4 sm:px-8 py-16 bg-[#141418] border-t border-white/5">
