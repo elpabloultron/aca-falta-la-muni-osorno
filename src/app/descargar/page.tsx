@@ -519,6 +519,31 @@ export default function DescargarPage() {
                     Instala «Acá Falta la Muni — Osorno» en tu teléfono Android directamente desde el repositorio oficial. Obtainium monitorea las nuevas versiones y te notifica para actualizar con un solo toque, con 0 % de rastreo y total independencia de Google Play o tiendas comerciales cerradas.
                   </p>
 
+                  {/* Caja de Enlace Directo para Copiar o Abrir */}
+                  <div className="bg-black/60 border border-purple-500/40 rounded-2xl p-3.5 space-y-1.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[10px] sm:text-[11px] font-bold text-purple-300 uppercase tracking-wider">
+                        Enlace del repositorio para Obtainium:
+                      </span>
+                      <span className="text-[10px] text-neutral-400">
+                        (Copia y pega en la app Obtainium)
+                      </span>
+                    </div>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 bg-purple-950/40 border border-purple-500/20 rounded-xl px-3 py-2">
+                      <code className="text-xs font-mono text-purple-200 select-all break-all">
+                        https://github.com/elpabloultron/aca-falta-la-muni-osorno
+                      </code>
+                      <a
+                        href="https://github.com/elpabloultron/aca-falta-la-muni-osorno/releases/tag/v1.0.0"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 text-[11px] font-bold text-[#F4CA19] hover:underline"
+                      >
+                        Ver Releases en GitHub →
+                      </a>
+                    </div>
+                  </div>
+
                   <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 pt-1 text-xs">
                     <span className="bg-black/60 border border-purple-500/30 px-3 py-1 rounded-xl text-purple-200 font-mono flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-purple-400" />
@@ -537,23 +562,35 @@ export default function DescargarPage() {
                   <a
                     href="obtainium://app/https://github.com/elpabloultron/aca-falta-la-muni-osorno"
                     className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xl shadow-purple-900/30 transition-all cursor-pointer active:scale-95 text-center"
+                    title="Abre automáticamente la app Obtainium si ya la tienes instalada en tu teléfono"
                   >
                     <RefreshCw className="w-4 h-4 text-purple-200" />
                     <span>Añadir a Obtainium en 1 Toque</span>
                   </a>
 
                   <a
-                    href="https://github.com/ImranR98/Obtainium"
+                    href="https://github.com/elpabloultron/aca-falta-la-muni-osorno/releases/tag/v1.0.0"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-2.5 rounded-2xl bg-purple-900/40 hover:bg-purple-900/60 text-white font-bold text-xs flex items-center justify-center gap-2 border border-purple-500/40 transition-all cursor-pointer text-center"
+                  >
+                    <Package className="w-3.5 h-3.5 text-[#F4CA19]" />
+                    <span>Ver Release v1.0.0 y APK</span>
+                  </a>
+
+                  <a
+                    href="https://github.com/ImranR98/Obtainium/releases/latest"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-5 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white font-semibold text-xs flex items-center justify-center gap-2 border border-purple-500/30 transition-all cursor-pointer text-center"
                   >
                     <ExternalLink className="w-3.5 h-3.5 text-purple-400" />
-                    <span>¿Qué es Obtainium? Descargar gestor</span>
+                    <span>Instalar App Obtainium (APK)</span>
                   </a>
                 </div>
               </div>
             </div>
+
 
             {/* Banner 2: F-Droid (Catálogo Oficial de Software Libre) */}
             <div className="relative overflow-hidden bg-gradient-to-br from-[#091b2e] via-[#071626] to-[#040e1a] border-2 border-[#19B5FE]/40 hover:border-[#19B5FE]/80 rounded-3xl p-6 sm:p-8 shadow-2xl transition-all duration-300 group">
