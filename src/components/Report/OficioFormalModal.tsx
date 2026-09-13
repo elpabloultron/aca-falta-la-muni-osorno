@@ -195,17 +195,20 @@ export const OficioFormalModal: React.FC<OficioFormalModalProps> = ({ report, on
             {/* 5. Fundamentos de Derecho */}
             <div>
               <h4 className="font-sans font-black text-neutral-900 text-xs sm:text-sm uppercase tracking-wide border-b border-neutral-300 pb-1 mb-2">
-                5. Fundamentos normativos y legales
+                5. Fundamentos normativos y jurisprudencia administrativa
               </h4>
               <ol className="list-decimal list-inside space-y-1.5 font-sans text-xs">
                 <li>
-                  <strong>Ley N° 18.695 (Orgánica Constitucional de Municipalidades):</strong> En sus Artículos 1°, 3° letra f) y 5° letras c) y d), encomienda de manera privativa y obligatoria al municipio la administración, conservación y mantención de los bienes nacionales de uso público, así como el resguardo de las condiciones de seguridad de la comuna.
+                  <strong>Ley N° 18.695 (Orgánica Constitucional de Municipalidades):</strong> En sus Artículos 1°, 3° letra f), 5° letra c) y 141, encomienda de manera privativa al municipio la administración y vialidad urbana y rural, estableciendo la responsabilidad directa de la entidad edilicia por falta de servicio frente a daños causados a los administrados.
                 </li>
                 <li>
-                  <strong>Ley N° 19.880 (Procedimientos Administrativos):</strong> Establece en sus Artículos 7° y 8° los principios de celeridad, economía procedimental y el carácter conclusivo de las actuaciones administrativas, imponiendo a la autoridad el deber inexcusable de emitir un pronunciamiento formal.
+                  <strong>Ley N° 18.290 de Tránsito (Art. 174, inciso 5°):</strong> Consagra que la Municipalidad respectiva es civilmente responsable de todos los daños que se causaren con ocasión de un accidente que sea consecuencia del mal estado de las vías públicas o de su falta o inadecuada señalización, tramitándose en juicio sumario civil.
                 </li>
                 <li>
-                  <strong>Ley N° 18.290 de Tránsito (Art. 99):</strong> Hace civil y patrimonialmente responsable a la Municipalidad de Osorno de los daños, accidentes o perjuicios que se originen con ocasión del mal estado de las calzadas, veredas o de la ausencia de oportuna señalización vial.
+                  <strong>Ley N° 19.880 (Bases de los Procedimientos Administrativos):</strong> Arts. 7°, 8° y 14, que fijan los principios de celeridad, conclusivo e inexcusabilidad, estableciendo un plazo máximo legal de 30 días para emitir una resolución fundada.
+                </li>
+                <li>
+                  <strong>Jurisprudencia Vinculante de la Contraloría General de la República (Dictamen CGR N° E11647/2025 y concordantes):</strong> La CGR ha determinado expresamente que la facultad privativa municipal sobre bienes nacionales de uso público «incluye la obligación de conservar y reponer las aceras y calzadas», sin que la falta de presupuesto o demora justifique el incumplimiento de este deber de seguridad pública.
                 </li>
               </ol>
             </div>
