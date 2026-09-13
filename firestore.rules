@@ -3,51 +3,10 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // ===============================================================
-    // Assumed Data Model
-    // ===============================================================
-    //
-    // Collection: reports
-    // Document ID: custom report ID (e.g. rep_xxx)
-    // Fields:
-    //   - id: string (required) - Identificador único de la denuncia
-    //   - title: string (required, 3-100 chars) - Título del problema
-    //   - description: string (required, 5-1500 chars) - Detalle y consecuencias
-    //   - category: string (required) - Categoría comunal válida
-    //   - sector: string (required) - Barrio o sector de Osorno
-    //   - is_rural: bool (optional) - Indica si pertenece a sector rural
-    //   - address_reference: string (required) - Dirección o punto referencial
-    //   - latitude: number (required) - Coordenada latitud en Osorno
-    //   - longitude: number (required) - Coordenada longitud en Osorno
-    //   - image_url: string (optional) - Fotografía de evidencia
-    //   - resolved_image_url: string (optional) - Evidencia de solución
-    //   - author_name: string (required) - Nombre o 'Vecino de Osorno'
-    //   - is_anonymous: bool (required) - Publicación anónima
-    //   - status: string (required: 'pendiente', 'en_revision', 'resuelto')
-    //   - support_count: number (required, >= 0) - Cantidad de apoyos vecinales
-    //   - flags_count: number (optional, >= 0) - Contador de denuncias por moderación
-    //   - is_hidden: bool (optional) - Oculto por moderación
-    //   - created_at: string (required) - Fecha ISO 8601
-    //   - updated_at: string (required) - Fecha ISO 8601
-    //   - resolved_at: string (optional) - Fecha ISO 8601 de solución
-    //
-    // Collection: supports
-    // Document ID: [reportId]_[deviceId]
-    // Fields:
-    //   - report_id: string (required)
-    //   - device_id: string (required)
-    //   - created_at: string (required)
-    //
-    // Collection: moderation_flags
-    // Document ID: [reportId]_[deviceId] o auto-id
-    // Fields:
-    //   - report_id: string (required)
-    //   - device_id: string (required)
-    //   - reason: string (optional)
-    //   - created_at: string (required)
-    //
+    // Reglas Blindadas de Seguridad Ciudadana - Acá Falta la Muni (Osorno)
+    // Auditoría de Seguridad: Red Team / OWASP / Prevención de Abusos
     // ===============================================================
 
-    // Helper Functions
     function isValidCategory(cat) {
       return cat in ['calles', 'iluminacion', 'limpieza', 'aguas', 'espacios', 'accesibilidad', 'transito', 'animales', 'medio_ambiente', 'otros'];
     }
@@ -56,60 +15,110 @@ service cloud.firestore {
       return st in ['pendiente', 'en_revision', 'resuelto'];
     }
 
+    // 1. Validación estricta de creación de reportes
     function isValidReportCreate(data) {
       return data.keys().hasAll(['title', 'description', 'category', 'sector', 'latitude', 'longitude', 'status', 'support_count', 'created_at'])
+        // Título delimitado
         && data.title is string && data.title.size() >= 3 && data.title.size() <= 100
+        // Descripción acotada (previene saturación / buffer abuse)
         && data.description is string && data.description.size() >= 5 && data.description.size() <= 1500
         && isValidCategory(data.category)
-        && data.sector is string && data.sector.size() >= 2
+        && data.sector is string && data.sector.size() >= 2 && data.sector.size() <= 80
+        // Coordenadas estrictamente confinadas a la provincia / comuna de Osorno
         && data.latitude is number && data.latitude >= -42.0 && data.latitude <= -39.0
         && data.longitude is number && data.longitude >= -75.0 && data.longitude <= -71.0
         && data.status in ['pendiente', 'en_revision']
-        && data.support_count is number && data.support_count >= 0;
+        // Apoyos iniciales seguros
+        && data.support_count is number && data.support_count >= 0 && data.support_count <= 5
+        && data.created_at is string;
     }
 
-    function isValidReportUpdate(data) {
-      return isValidCategory(data.category)
-        && isValidStatus(data.status)
-        && data.support_count is number && data.support_count >= 0;
+    // 2. Validación estricta de actualización (Elimina el 'Update Bypass' y preserva inmutabilidad)
+    function isValidReportUpdate(data, prev) {
+      // Campos absolutamente inmutables una vez creada la denuncia
+      let immutablePreserved = 
+        data.title == prev.title
+        && data.description == prev.description
+        && data.category == prev.category
+        && data.sector == prev.sector
+        && data.latitude == prev.latitude
+        && data.longitude == prev.longitude
+        && data.created_at == prev.created_at
+        && (prev.get('id', '') == '' || data.id == prev.id)
+        && (prev.get('author_name', '') == '' || data.author_name == prev.author_name)
+        && (prev.get('is_anonymous', false) == false || data.is_anonymous == prev.is_anonymous);
+
+      // Mutaciones legítimas permitidas por la aplicación:
+      // Caso A: Apoyo cívico (+1 o -1 sin saltos gigantescos)
+      let isSupportMutation = 
+        data.support_count is number
+        && (data.support_count == prev.support_count + 1 || data.support_count == prev.support_count - 1 || data.support_count == prev.support_count)
+        && data.status == prev.status;
+
+      // Caso B: Moderación comunitaria (acumulación de marcas o censura preventiva con >= 3)
+      let isModerationMutation = 
+        data.flags_count is number
+        && data.flags_count >= prev.get('flags_count', 0)
+        && data.flags_count <= prev.get('flags_count', 0) + 1
+        && (data.is_hidden is bool);
+
+      // Caso C: Marcado de resolución (con evidencia opcional)
+      let isResolutionMutation = 
+        isValidStatus(data.status)
+        && (data.status != 'resuelto' || data.resolved_at is string);
+
+
+      return immutablePreserved && (isSupportMutation || isModerationMutation || isResolutionMutation);
     }
 
+    // 3. Validación de comentarios comunitarios
     function isValidCommentCreate(data) {
       return data.keys().hasAll(['report_id', 'comment', 'created_at', 'author_name', 'is_anonymous'])
-        && data.report_id is string
-        && data.comment is string
-        && data.comment.size() >= 2
-        && data.comment.size() <= 600
-        && data.author_name is string
+        && data.report_id is string && data.report_id.size() >= 3 && data.report_id.size() <= 80
+        && data.comment is string && data.comment.size() >= 2 && data.comment.size() <= 600
+        && data.author_name is string && data.author_name.size() >= 2 && data.author_name.size() <= 80
         && data.is_anonymous is bool
         && data.created_at is string;
     }
 
+    // Colección: Denuncias ciudadanas
     match /reports/{reportId} {
-      // Lectura pública para cualquier ciudadano o entidad fiscalizadora
+      // Lectura abierta para transparencia cívica comunal
       allow read: if true;
       
-      // Creación ciudadana abierta con validación estricta de estructura y tipos
+      // Creación con validación estricta de estructura y límites de longitud
       allow create: if isValidReportCreate(request.resource.data);
 
-      // Actualizaciones permitidas para sumar apoyos cívicos (+1), moderar o marcar como resuelto
-      allow update: if isValidReportUpdate(request.resource.data);
+      // Actualización protegida: campos inmutables bloqueados y cambios de estado regulados
+      allow update: if isValidReportUpdate(request.resource.data, resource.data);
 
-      // No permitir borrado arbitrario para preservar la memoria cívica de la comuna
+      // Prohibido el borrado para preservar el registro histórico de inacción municipal
       allow delete: if false;
     }
 
+    // Colección: Apoyos únicos por dispositivo (+1)
     match /supports/{supportId} {
       allow read: if true;
-      allow write: if request.resource.data.report_id is string && request.resource.data.device_id is string;
-    }
-
-    match /moderation_flags/{flagId} {
-      allow read: if true;
-      allow create: if request.resource.data.report_id is string && request.resource.data.device_id is string;
+      allow create: if request.resource.data.report_id is string 
+                    && request.resource.data.device_id is string
+                    && request.resource.data.report_id.size() > 0
+                    && request.resource.data.device_id.size() > 0
+                    && request.resource.data.created_at is string;
       allow update, delete: if false;
     }
 
+    // Colección: Denuncias de moderación
+    match /moderation_flags/{flagId} {
+      allow read: if true;
+      allow create: if request.resource.data.report_id is string 
+                    && request.resource.data.device_id is string
+                    && request.resource.data.report_id.size() > 0
+                    && request.resource.data.device_id.size() > 0
+                    && request.resource.data.created_at is string;
+      allow update, delete: if false;
+    }
+
+    // Colección: Muro de comentarios vecinales
     match /comments/{commentId} {
       allow read: if true;
       allow create: if isValidCommentCreate(request.resource.data);

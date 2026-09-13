@@ -35,6 +35,8 @@ jobs:
         run: npm run build
         env:
           GITHUB_PAGES: 'true'
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+
 
       - name: Desactivar motor Jekyll en GitHub Pages (.nojekyll)
         run: touch out/.nojekyll
