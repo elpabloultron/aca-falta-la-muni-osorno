@@ -1,69 +1,307 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import React, { useState, useEffect, useMemo } from 'react';
+import dynamic from 'next/dynamic';
+import { Report, ReportCategory, ReportStatus, StatsSummary } from '@/types/report';
+import {
+  calculateStatsSummary,
+  fetchReportsFromApi,
+  createReportAction,
+  toggleSupportAction,
+  resolveReportAction,
+  getStoredReports,
+  getUserSupportedReportIds,
+} from '@/lib/storage';
+import { HeaderStats } from '@/components/HUD/HeaderStats';
+import { CategoryFilters } from '@/components/HUD/CategoryFilters';
+import { ReportDetailModal } from '@/components/Report/ReportDetailModal';
+import { CreateReportDrawer } from '@/components/Report/CreateReportDrawer';
+import { ReportFeedView } from '@/components/Feed/ReportFeedView';
+import { TopUnresolvedWidget } from '@/components/HUD/TopUnresolvedWidget';
+import { MunicipalAnalyticsModal } from '@/components/Analytics/MunicipalAnalyticsModal';
+import { InstallAppModal } from '@/components/PWA/InstallAppModal';
+import { OSORNO_CENTER } from '@/config/osorno';
+import { MapPin } from 'lucide-react';
+
+// Carga dinámica de Leaflet para aislar ejecución del lado del cliente
+const MapView = dynamic(
+  () => import('@/components/Map/MapView').then((m) => m.MapView),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex items-center justify-center bg-[#141414] text-neutral-400 text-xs">
+        <div className="flex flex-col items-center gap-2.5">
+          <div className="w-9 h-9 rounded-full border-2 border-[#F4CA19] border-t-transparent animate-spin" />
+          <span className="font-semibold text-neutral-300">Cargando cartografía comunal de Osorno...</span>
+        </div>
+      </div>
+    ),
+  }
+);
+
+export default function HomePage() {
+  const [reports, setReports] = useState<Report[]>([]);
+  const [userSupportedIds, setUserSupportedIds] = useState<Set<string>>(new Set());
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const [isCreatingReport, setIsCreatingReport] = useState(false);
+  const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
+  const [pickedCoords, setPickedCoords] = useState<{ lat: number; lng: number } | null>(null);
+
+  // Estados de vista y filtros
+  const [viewMode, setViewMode] = useState<'pines' | 'calor' | 'feed'>('pines');
+  const [selectedCategory, setSelectedCategory] = useState<ReportCategory | 'todas'>('todas');
+  const [selectedStatus, setSelectedStatus] = useState<ReportStatus | 'todos'>('todos');
+  const [selectedSector, setSelectedSector] = useState<string | 'todos'>('todos');
+
+  // Inicializar reportes sincronizados con SQLite y apoyos locales
+  useEffect(() => {
+    // 1. Mostrar de inmediato la caché local rápida
+    const local = getStoredReports();
+    setReports(local);
+    setUserSupportedIds(getUserSupportedReportIds());
+
+    // 2. Sincronizar en segundo plano con la base de datos relacional SQLite
+    fetchReportsFromApi().then((serverData) => {
+      if (serverData && serverData.length > 0) {
+        setReports(serverData);
+      }
+    });
+
+    // Detectar si la URL contiene un reporte específico (?reporte=xxx) o invitación (?descargar=1)
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const repId = params.get('reporte');
+      if (repId) {
+        const found = local.find((r) => r.id === repId);
+        if (found) setSelectedReport(found);
+      }
+      if (params.get('descargar') === '1' || params.get('app') === '1') {
+        setIsInstallModalOpen(true);
+      } else {
+        // En móviles, invitar a instalar en la primera visita con un ligero retraso no invasivo
+        const dismissed = localStorage.getItem('osorno_install_prompt_dismissed_v1');
+        const isMobile = /iphone|ipad|ipod|android/i.test(navigator.userAgent);
+        if (!dismissed && isMobile) {
+          const timer = setTimeout(() => {
+            setIsInstallModalOpen(true);
+          }, 1800);
+          return () => clearTimeout(timer);
+        }
+      }
+    }
+
+    const handleReportsChanged = (e: any) => {
+      if (e.detail) {
+        setReports(e.detail);
+      } else {
+        setReports(getStoredReports());
+      }
+      setUserSupportedIds(getUserSupportedReportIds());
+    };
+
+    window.addEventListener('osorno-reports-changed', handleReportsChanged);
+    return () => {
+      window.removeEventListener('osorno-reports-changed', handleReportsChanged);
+    };
+  }, []);
+
+  // Filtrado de reportes para el mapa y feed
+  const filteredReports = useMemo(() => {
+    return reports.filter((r) => {
+      if (selectedCategory !== 'todas' && r.category !== selectedCategory) return false;
+      if (selectedStatus !== 'todos' && r.status !== selectedStatus) return false;
+      if (selectedSector !== 'todos' && r.sector !== selectedSector) return false;
+      return true;
+    });
+  }, [reports, selectedCategory, selectedStatus, selectedSector]);
+
+  // Métricas agregadas
+  const stats: StatsSummary = useMemo(() => {
+    return calculateStatsSummary(reports);
+  }, [reports]);
+
+  // Apoyar o quitar apoyo (+1) con persistencia en SQLite
+  const handleToggleSupport = async (reportId: string) => {
+    const { newCount } = await toggleSupportAction(reportId);
+    setUserSupportedIds(getUserSupportedReportIds());
+    setReports(getStoredReports());
+
+    if (selectedReport && selectedReport.id === reportId) {
+      setSelectedReport({
+        ...selectedReport,
+        support_count: newCount,
+      });
+    }
+  };
+
+  // Marcar como resuelto en base de datos SQLite
+  const handleResolveReport = async (reportId: string, resolvedImageUrl?: string) => {
+    await resolveReportAction(reportId, resolvedImageUrl);
+    setReports(getStoredReports());
+    if (selectedReport && selectedReport.id === reportId) {
+      setSelectedReport({
+        ...selectedReport,
+        status: 'resuelto',
+        resolved_image_url: resolvedImageUrl || selectedReport.resolved_image_url,
+      });
+    }
+  };
+
+  // Clic en el mapa para situar o crear reporte
+  const handleMapClick = (coords: { lat: number; lng: number }) => {
+    if (isCreatingReport) {
+      setPickedCoords(coords);
+    } else {
+      setPickedCoords(coords);
+      setIsCreatingReport(true);
+    }
+  };
+
+  // Publicar nuevo reporte en SQLite
+  const handleCreateReportSubmit = async (reportData: any) => {
+    const created = await createReportAction(reportData);
+    setReports(getStoredReports());
+    setUserSupportedIds(getUserSupportedReportIds());
+    setIsCreatingReport(false);
+    setPickedCoords(null);
+    setSelectedReport(created);
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className="relative w-screen h-[100dvh] overflow-hidden bg-[#141414] select-none font-sans">
+      {/* 1. Contenedor Superior Unificado (HUD Responsive Móvil y Escritorio) */}
+      <div className="absolute top-2 sm:top-3 left-2 sm:left-3 right-2 sm:right-3 z-30 pointer-events-none flex flex-col gap-1.5 sm:gap-2 max-w-7xl mx-auto">
+        <HeaderStats
+          stats={stats}
+          viewMode={viewMode}
+          onChangeViewMode={(mode) => setViewMode(mode)}
+          onOpenCreate={() => {
+            setPickedCoords(OSORNO_CENTER);
+            setIsCreatingReport(true);
+          }}
+          onOpenAnalytics={() => setIsAnalyticsOpen(true)}
+          onOpenInstall={() => setIsInstallModalOpen(true)}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+
+        {/* 2. Filtros de Categorías, Estados y Sectores (Urbano y Rural) */}
+        {viewMode !== 'feed' && (
+          <CategoryFilters
+            reports={reports}
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+            selectedStatus={selectedStatus}
+            onSelectStatus={setSelectedStatus}
+            selectedSector={selectedSector}
+            onSelectSector={setSelectedSector}
+          />
+        )}
+      </div>
+
+      {/* 3. Área Principal: Mapa Interactivo o Muro Feed */}
+      <div className="w-full h-full z-0">
+        {viewMode === 'feed' ? (
+          <ReportFeedView
+            reports={filteredReports}
+            userSupportedIds={userSupportedIds}
+            onSelectReport={(rep) => setSelectedReport(rep)}
+            onToggleSupport={handleToggleSupport}
+            onSwitchToMap={() => setViewMode('pines')}
+          />
+        ) : (
+          <MapView
+            reports={filteredReports}
+            selectedReport={selectedReport}
+            selectedSector={selectedSector}
+            onSelectReport={(rep) => setSelectedReport(rep)}
+            viewMode={viewMode === 'calor' ? 'calor' : 'pines'}
+            onMapClick={handleMapClick}
+            pickedCoords={isCreatingReport ? pickedCoords : null}
+          />
+        )}
+      </div>
+
+      {/* Mensaje de Estado Inicial Limpio cuando no hay denuncias registradas */}
+      {reports.length === 0 && viewMode !== 'feed' && !isCreatingReport && !selectedReport && (
+        <div className="pointer-events-none fixed inset-0 flex items-center justify-center p-4 z-20">
+          <div className="pointer-events-auto bg-[#141414]/92 backdrop-blur-md border border-white/10 rounded-2xl p-6 text-center max-w-sm shadow-2xl animate-fadeIn">
+            <div className="w-12 h-12 rounded-full bg-[#F4CA19]/20 text-[#F4CA19] flex items-center justify-center mx-auto mb-3">
+              <MapPin className="w-6 h-6" />
+            </div>
+            <h2 className="text-white font-black text-sm mb-1.5">El mapa de Osorno está listo</h2>
+            <p className="text-neutral-400 text-xs mb-4 leading-relaxed">
+              No hay denuncias de prueba registradas. Sé la primera persona en fiscalizar un problema en tu barrio o sector rural.
+            </p>
+            <button
+              type="button"
+              onClick={() => setIsCreatingReport(true)}
+              className="w-full bg-[#F4CA19] hover:bg-[#ffe043] text-black font-black text-xs py-2.5 px-4 rounded-xl shadow-lg transition-all cursor-pointer"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+              + Crear la primera denuncia
+            </button>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      )}
+
+      {/* 4. Widget Inferior Izquierdo: Top 10 Denuncias con Más Tiempo sin Solución */}
+      {viewMode !== 'feed' && (
+        <TopUnresolvedWidget
+          reports={reports}
+          onSelectReport={(rep) => setSelectedReport(rep)}
+          selectedReportId={selectedReport?.id}
+        />
+      )}
+
+      {/* 5. Modal de Auditoría y Comportamiento Municipal */}
+      {isAnalyticsOpen && (
+        <MunicipalAnalyticsModal onClose={() => setIsAnalyticsOpen(false)} />
+      )}
+
+      {/* 6. Modal / Drawer de Ficha Detallada */}
+      {selectedReport && (
+        <ReportDetailModal
+          report={selectedReport}
+          isSupportedByUser={userSupportedIds.has(selectedReport.id)}
+          onClose={() => {
+            setSelectedReport(null);
+            if (typeof window !== 'undefined') {
+              const url = new URL(window.location.href);
+              url.searchParams.delete('reporte');
+              window.history.replaceState({}, '', url.toString());
+            }
+          }}
+          onToggleSupport={handleToggleSupport}
+          onResolveReport={handleResolveReport}
+        />
+      )}
+
+      {/* 7. Cajón de Creación de Nuevo Reporte */}
+      {isCreatingReport && (
+        <CreateReportDrawer
+          initialCoords={pickedCoords}
+          existingReports={reports}
+          onClose={() => {
+            setIsCreatingReport(false);
+            setPickedCoords(null);
+          }}
+          onSubmitReport={handleCreateReportSubmit}
+          onSelectExistingReport={(existing) => {
+            setSelectedReport(existing);
+            setIsCreatingReport(false);
+          }}
+        />
+      )}
+
+      {/* 8. Modal de Instalación y Descarga de la App (Android e iOS) */}
+      <InstallAppModal
+        isOpen={isInstallModalOpen}
+        onClose={() => {
+          setIsInstallModalOpen(false);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('osorno_install_prompt_dismissed_v1', 'true');
+          }
+        }}
+      />
+    </main>
   );
 }

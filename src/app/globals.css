@@ -1,26 +1,110 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #141414;
+  --foreground: #f3f4f6;
+  --brand-yellow: #F4CA19;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: #141414;
+  color: #f3f4f6;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Ocultar barra de desplazamiento manteniendo funcionalidad */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Ajustes finos de cartografía Leaflet */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  background-color: #141414 !important;
+  font-family: inherit;
+}
+
+.leaflet-control-attribution {
+  background: rgba(20, 20, 20, 0.85) !important;
+  color: #9ca3af !important;
+  font-size: 10px !important;
+  padding: 2px 8px !important;
+  border-top-left-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(6px);
+}
+
+.leaflet-control-attribution a {
+  color: #F4CA19 !important;
+  text-decoration: none !important;
+}
+
+.leaflet-control-attribution a:hover {
+  text-decoration: underline !important;
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Marcadores personalizados */
+.custom-muni-pin {
+  background: transparent;
+  border: none;
+}
+
+.picked-pin-marker {
+  background: transparent;
+  border: none;
+}
+
+/* Ventana emergente (Popup) táctica sobre pines del mapa */
+.custom-muni-popup .leaflet-popup-content-wrapper {
+  background: rgba(22, 22, 24, 0.96) !important;
+  backdrop-filter: blur(14px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.5) !important;
+  padding: 4px !important;
+  color: #f3f4f6 !important;
+}
+
+.custom-muni-popup .leaflet-popup-tip {
+  background: rgba(22, 22, 24, 0.96) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+.custom-muni-popup .leaflet-popup-close-button {
+  color: #9ca3af !important;
+  padding: 6px !important;
+}
+
+.custom-muni-popup .leaflet-popup-close-button:hover {
+  color: #ffffff !important;
+}
+
+.custom-muni-popup .leaflet-popup-content {
+  margin: 8px 10px !important;
+  line-height: 1.4 !important;
 }
