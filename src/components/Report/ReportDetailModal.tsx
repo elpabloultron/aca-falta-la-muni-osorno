@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Report } from '@/types/report';
+import React, { useState, useEffect } from 'react';
+import { Report, ReportComment } from '@/types/report';
 import { CATEGORIAS_REPORTE } from '@/config/osorno';
 import {
   X,
@@ -18,12 +18,16 @@ import {
   FileText,
   Flag,
   ShieldAlert,
+  MessageSquare,
+  Send,
+  ShieldCheck,
+  RefreshCw,
 } from 'lucide-react';
 import { CategoryIcon } from '../CategoryIcon';
 import { compressImage, uploadImageToServer } from '@/lib/compression';
 import { ShareModal } from '../Share/ShareModal';
 import { OficioFormalModal } from './OficioFormalModal';
-import { getDeviceId, flagReportAction } from '@/lib/storage';
+import { getDeviceId, flagReportAction, subscribeToReportComments, createCommentAction } from '@/lib/storage';
 import { calculateDaysElapsed, formatElapsedDays, formatResolvedDays } from '@/lib/geo-utils';
 
 interface ReportDetailModalProps {
@@ -54,6 +58,36 @@ export const ReportDetailModal: React.FC<ReportDetailModalProps> = ({
   const [isFlagging, setIsFlagging] = useState(false);
   const [flagMessage, setFlagMessage] = useState<string | null>(null);
   const [flagsCount, setFlagsCount] = useState<number>(report.flags_count || 0);
+
+  // Comentarios vecinales
+  const [comments, setComments] = useState<ReportComment[]>([]);
+  const [commentText, setCommentText] = useState('');
+  const [commentAuthor, setCommentAuthor] = useState('');
+  const [commentIsAnonymous, setCommentIsAnonymous] = useState(true);
+  const [commentAlsoSupport, setCommentAlsoSupport] = useState(!isSupportedByUser);
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [commentError, setCommentError] = useState<string | null>(null);
+
+  // Captcha anti-spam en comentarios
+  const [commentCaptchaA, setCommentCaptchaA] = useState(2);
+  const [commentCaptchaB, setCommentCaptchaB] = useState(3);
+  const [commentCaptchaInput, setCommentCaptchaInput] = useState('');
+
+  const refreshCommentCaptcha = () => {
+    const a = Math.floor(Math.random() * 6) + 2; // 2..7
+    const b = Math.floor(Math.random() * 6) + 1; // 1..6
+    setCommentCaptchaA(a);
+    setCommentCaptchaB(b);
+    setCommentCaptchaInput('');
+  };
+
+  useEffect(() => {
+    refreshCommentCaptcha();
+    const unsubscribe = subscribeToReportComments(report.id, (loadedComments) => {
+      setComments(loadedComments);
+    });
+    return () => unsubscribe();
+  }, [report.id]);
 
   const catInfo = CATEGORIAS_REPORTE[report.category];
   const isResolved = report.status === 'resuelto';
@@ -104,6 +138,46 @@ export const ReportDetailModal: React.FC<ReportDetailModalProps> = ({
   const handleConfirmResolve = () => {
     onResolveReport(report.id, resolveImage || undefined);
     setShowResolveForm(false);
+  };
+
+  const handleCommentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCommentError(null);
+
+    const cleanComment = commentText.trim();
+    if (cleanComment.length < 2) {
+      setCommentError('Por favor escribe tu comentario o aporte sobre esta problemática.');
+      return;
+    }
+
+    const expected = commentCaptchaA + commentCaptchaB;
+    if (parseInt(commentCaptchaInput.trim(), 10) !== expected) {
+      setCommentError(`Control anti-spam: la suma de ${commentCaptchaA} + ${commentCaptchaB} no es correcta. Intenta nuevamente.`);
+      refreshCommentCaptcha();
+      return;
+    }
+
+    setIsSubmittingComment(true);
+    try {
+      await createCommentAction(report.id, {
+        author_name: commentAuthor,
+        is_anonymous: commentIsAnonymous,
+        comment: cleanComment,
+        alsoSupport: commentAlsoSupport && !isSupportedByUser,
+      });
+
+      if (commentAlsoSupport && !isSupportedByUser) {
+        onToggleSupport(report.id);
+      }
+
+      setCommentText('');
+      setCommentError(null);
+      refreshCommentCaptcha();
+    } catch (err: any) {
+      setCommentError(err.message || 'Error al publicar el comentario.');
+    } finally {
+      setIsSubmittingComment(false);
+    }
   };
 
   const handleFlagSubmit = async () => {
@@ -336,6 +410,169 @@ export const ReportDetailModal: React.FC<ReportDetailModalProps> = ({
               <FileText className="w-3.5 h-3.5" />
               <span>Generar Oficio Formal</span>
             </button>
+          </div>
+
+          {/* Sección de Comentarios y Testimonios Vecinales en Tiempo Real */}
+          <div className="bg-neutral-900/70 border border-white/5 rounded-2xl p-4 space-y-3.5">
+            <div className="flex items-center justify-between border-b border-neutral-800 pb-2.5">
+              <h3 className="text-white text-xs font-black uppercase tracking-wider flex items-center gap-2">
+                <MessageSquare className="w-4 h-4 text-[#F4CA19]" />
+                <span>Comentarios de la comunidad ({comments.length})</span>
+              </h3>
+              <span className="text-[10px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/20 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                En tiempo real
+              </span>
+            </div>
+
+            {/* Listado de comentarios */}
+            <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1">
+              {comments.length === 0 ? (
+                <div className="py-4 text-center text-neutral-500 text-xs italic">
+                  Aún no hay comentarios. Sé la primera vecina o vecino en aportar antecedentes.
+                </div>
+              ) : (
+                comments.map((c) => {
+                  const commentDate = new Date(c.created_at).toLocaleDateString('es-CL', {
+                    day: 'numeric',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  });
+                  return (
+                    <div
+                      key={c.id}
+                      className="bg-neutral-800/80 border border-white/5 rounded-xl p-3 space-y-1.5"
+                    >
+                      <div className="flex items-center justify-between text-[11px]">
+                        <div className="flex items-center gap-1.5 font-bold text-neutral-300">
+                          <div className="w-4 h-4 rounded-full bg-[#F4CA19]/20 text-[#F4CA19] flex items-center justify-center text-[9px] font-black">
+                            {c.is_anonymous ? '?' : c.author_name.charAt(0).toUpperCase()}
+                          </div>
+                          <span className={c.is_anonymous ? 'text-neutral-400 font-medium' : 'text-[#F4CA19]'}>
+                            {c.author_name}
+                          </span>
+                        </div>
+                        <span className="text-neutral-500 text-[10px]">{commentDate}</span>
+                      </div>
+                      <p className="text-neutral-200 text-xs leading-relaxed whitespace-pre-line">
+                        {c.comment}
+                      </p>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Formulario para agregar comentario */}
+            <form onSubmit={handleCommentSubmit} className="pt-2 border-t border-neutral-800 space-y-2.5">
+              <textarea
+                rows={2}
+                placeholder="Escribe tu testimonio, agrega detalles o actualiza la situación..."
+                value={commentText}
+                onChange={(e) => {
+                  setCommentText(e.target.value);
+                  if (commentError) setCommentError(null);
+                }}
+                className="w-full bg-neutral-800 border border-neutral-700 rounded-xl px-3 py-2 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-[#F4CA19] resize-none"
+              />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id={`anon_comment_${report.id}`}
+                    checked={commentIsAnonymous}
+                    onChange={(e) => setCommentIsAnonymous(e.target.checked)}
+                    className="w-3.5 h-3.5 rounded border-neutral-700 text-[#F4CA19] focus:ring-0 bg-neutral-800 cursor-pointer"
+                  />
+                  <label
+                    htmlFor={`anon_comment_${report.id}`}
+                    className="text-neutral-300 text-[11px] cursor-pointer"
+                  >
+                    Comentar de forma anónima
+                  </label>
+                </div>
+
+                {!commentIsAnonymous && (
+                  <input
+                    type="text"
+                    placeholder="Tu nombre o alias"
+                    value={commentAuthor}
+                    onChange={(e) => setCommentAuthor(e.target.value)}
+                    className="bg-neutral-800 border border-neutral-700 rounded-xl px-2.5 py-1.5 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-[#F4CA19]"
+                  />
+                )}
+              </div>
+
+              {!isSupportedByUser && (
+                <div className="flex items-center gap-2 bg-[#F4CA19]/10 border border-[#F4CA19]/20 rounded-xl px-3 py-1.5">
+                  <input
+                    type="checkbox"
+                    id={`also_support_${report.id}`}
+                    checked={commentAlsoSupport}
+                    onChange={(e) => setCommentAlsoSupport(e.target.checked)}
+                    className="w-3.5 h-3.5 rounded border-neutral-700 text-[#F4CA19] focus:ring-0 bg-neutral-800 cursor-pointer"
+                  />
+                  <label
+                    htmlFor={`also_support_${report.id}`}
+                    className="text-neutral-200 text-[11px] font-bold cursor-pointer flex items-center gap-1.5"
+                  >
+                    <ThumbsUp className="w-3 h-3 text-[#F4CA19]" />
+                    <span>Sumar también mi apoyo (+1) a esta denuncia</span>
+                  </label>
+                </div>
+              )}
+
+              {/* Anti-spam suma simple para comentarios */}
+              <div className="flex items-center justify-between gap-2 bg-neutral-800/60 rounded-xl px-3 py-1.5 border border-neutral-700/60">
+                <div className="flex items-center gap-1.5 text-[11px] text-neutral-300">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#F4CA19]" />
+                  <span>Suma anti-spam: {commentCaptchaA} + {commentCaptchaB} =</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="number"
+                    placeholder="Total"
+                    value={commentCaptchaInput}
+                    onChange={(e) => {
+                      setCommentCaptchaInput(e.target.value);
+                      if (commentError) setCommentError(null);
+                    }}
+                    className="w-16 bg-neutral-800 border border-neutral-700 rounded-lg px-2 py-1 text-xs text-center text-white focus:outline-none focus:border-[#F4CA19] font-bold"
+                  />
+                  <button
+                    type="button"
+                    onClick={refreshCommentCaptcha}
+                    className="text-neutral-400 hover:text-white p-1 cursor-pointer"
+                    title="Generar otra suma"
+                  >
+                    <RefreshCw className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+
+              {commentError && (
+                <div className="text-rose-400 text-[11px] font-semibold animate-fadeIn">
+                  {commentError}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isSubmittingComment}
+                className="w-full bg-[#F4CA19] hover:bg-[#ffe14d] text-black font-extrabold text-xs py-2 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60 shadow-md"
+              >
+                {isSubmittingComment ? (
+                  <span>Publicando comentario...</span>
+                ) : (
+                  <>
+                    <Send className="w-3.5 h-3.5" />
+                    <span>Publicar comentario</span>
+                  </>
+                )}
+              </button>
+            </form>
           </div>
 
           {/* Enlace discreto de moderación comunitaria */}

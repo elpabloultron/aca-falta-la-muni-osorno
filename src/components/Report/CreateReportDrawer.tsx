@@ -13,6 +13,8 @@ import {
   UploadCloud,
   ChevronRight,
   Info,
+  ShieldCheck,
+  RefreshCw,
 } from 'lucide-react';
 import { CategoryIcon } from '../CategoryIcon';
 import { compressImage, uploadImageToServer } from '@/lib/compression';
@@ -64,6 +66,23 @@ export const CreateReportDrawer: React.FC<CreateReportDrawerProps> = ({
   const [isAnonymous, setIsAnonymous] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Control anti-spam mediante captcha aritmético accesible
+  const [captchaA, setCaptchaA] = useState(3);
+  const [captchaB, setCaptchaB] = useState(4);
+  const [captchaInput, setCaptchaInput] = useState('');
+
+  const refreshCaptcha = () => {
+    const a = Math.floor(Math.random() * 8) + 2; // 2..9
+    const b = Math.floor(Math.random() * 8) + 1; // 1..8
+    setCaptchaA(a);
+    setCaptchaB(b);
+    setCaptchaInput('');
+  };
+
+  useEffect(() => {
+    refreshCaptcha();
+  }, []);
 
   const [isLocating, setIsLocating] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
@@ -154,6 +173,13 @@ export const CreateReportDrawer: React.FC<CreateReportDrawerProps> = ({
     const cleanDesc = description.trim();
     if (!cleanDesc) {
       setFormError('Por favor describe brevemente la problemática o sus consecuencias.');
+      return;
+    }
+
+    const expected = captchaA + captchaB;
+    if (parseInt(captchaInput.trim(), 10) !== expected) {
+      setFormError(`Control anti-spam: la suma de ${captchaA} + ${captchaB} no es correcta. Por favor resuelve la suma para publicar.`);
+      refreshCaptcha();
       return;
     }
 
@@ -466,6 +492,43 @@ export const CreateReportDrawer: React.FC<CreateReportDrawerProps> = ({
                 />
               </div>
             )}
+          </div>
+
+          {/* 6. Verificación Anti-Spam Comunitaria (Suma Aritmética Simple) */}
+          <div className="bg-neutral-900/60 border border-white/5 rounded-2xl p-3.5 space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-neutral-300 text-xs font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#F4CA19]" />
+                <span>6. Control anti-spam vecinal</span>
+              </label>
+              <button
+                type="button"
+                onClick={refreshCaptcha}
+                className="text-[11px] text-neutral-400 hover:text-[#F4CA19] flex items-center gap-1 transition-colors cursor-pointer"
+                title="Generar otra suma"
+              >
+                <RefreshCw className="w-3 h-3" />
+                <span>Cambiar suma</span>
+              </button>
+            </div>
+            <p className="text-[11px] text-neutral-400 leading-tight">
+              Para proteger a la comunidad del spam y bots, resuelve esta sencilla suma:
+            </p>
+            <div className="flex items-center gap-2.5 pt-1">
+              <div className="bg-neutral-800 border border-neutral-700/80 rounded-xl px-3.5 py-2 text-xs sm:text-sm font-extrabold text-white select-none tracking-wide">
+                ¿Cuánto es {captchaA} + {captchaB}? =
+              </div>
+              <input
+                type="number"
+                placeholder="Resultado"
+                value={captchaInput}
+                onChange={(e) => {
+                  setCaptchaInput(e.target.value);
+                  if (formError) setFormError(null);
+                }}
+                className="w-28 bg-neutral-800 border border-neutral-700 rounded-xl px-3 py-2 text-sm text-center text-white focus:outline-none focus:border-[#F4CA19] font-bold"
+              />
+            </div>
           </div>
 
           {/* Alerta visible si falta algún campo obligatorio */}

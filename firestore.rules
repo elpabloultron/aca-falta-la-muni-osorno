@@ -74,6 +74,17 @@ service cloud.firestore {
         && data.support_count is number && data.support_count >= 0;
     }
 
+    function isValidCommentCreate(data) {
+      return data.keys().hasAll(['report_id', 'comment', 'created_at', 'author_name', 'is_anonymous'])
+        && data.report_id is string
+        && data.comment is string
+        && data.comment.size() >= 2
+        && data.comment.size() <= 600
+        && data.author_name is string
+        && data.is_anonymous is bool
+        && data.created_at is string;
+    }
+
     match /reports/{reportId} {
       // Lectura pública para cualquier ciudadano o entidad fiscalizadora
       allow read: if true;
@@ -96,6 +107,12 @@ service cloud.firestore {
     match /moderation_flags/{flagId} {
       allow read: if true;
       allow create: if request.resource.data.report_id is string && request.resource.data.device_id is string;
+      allow update, delete: if false;
+    }
+
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if isValidCommentCreate(request.resource.data);
       allow update, delete: if false;
     }
   }

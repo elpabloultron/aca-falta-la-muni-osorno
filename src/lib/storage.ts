@@ -1,4 +1,4 @@
-import { Report, ReportCategory, StatsSummary, MunicipalBehaviorStats, CategoryStat, SectorStat } from '@/types/report';
+import { Report, ReportCategory, StatsSummary, MunicipalBehaviorStats, CategoryStat, SectorStat, ReportComment } from '@/types/report';
 import { CATEGORIAS_REPORTE } from '@/config/osorno';
 import { calculateDaysElapsed, isSectorRural } from './geo-utils';
 import { firestoreDb } from './firebase';
@@ -7,6 +7,7 @@ import {
   onSnapshot,
   query,
   orderBy,
+  where,
   doc,
   setDoc,
   updateDoc,
@@ -15,6 +16,7 @@ import {
 } from 'firebase/firestore';
 
 const FLAGS_KEY = 'aca_falta_la_muni_osorno_user_flags_v2';
+const COMMENTS_KEY_PREFIX = 'aca_falta_la_muni_osorno_comments_';
 
 const STORAGE_KEY = 'aca_falta_la_muni_osorno_reports_live_v1';
 const SUPPORTS_KEY = 'aca_falta_la_muni_osorno_user_supports_v2';
@@ -508,3 +510,114 @@ export function calculateMunicipalBehaviorStats(reports?: Report[]): MunicipalBe
     top10Unresolved,
   };
 }
+
+export function getStoredComments(reportId: string): ReportComment[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(COMMENTS_KEY_PREFIX + reportId);
+    if (!raw) return [];
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+
+export function saveStoredComments(reportId: string, comments: ReportComment[]): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(COMMENTS_KEY_PREFIX + reportId, JSON.stringify(comments));
+  } catch (err) {
+    console.error('Error guardando comentarios en localStorage:', err);
+  }
+}
+
+/**
+ * Suscripción reactiva en tiempo real a los comentarios de un reclamo en Cloud Firestore
+ */
+export function subscribeToReportComments(
+  reportId: string,
+  onUpdate: (comments: ReportComment[]) => void
+): () => void {
+  if (typeof window === 'undefined') return () => {};
+  try {
+    const q = query(
+      collection(firestoreDb, 'comments'),
+      where('report_id', '==', reportId)
+    );
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const cloudComments: ReportComment[] = [];
+        snapshot.forEach((docSnap) => {
+          cloudComments.push(docSnap.data() as ReportComment);
+        });
+        cloudComments.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        saveStoredComments(reportId, cloudComments);
+        onUpdate(cloudComments);
+      },
+      (error) => {
+        console.warn('Listener Firestore comentarios desconectado (usando caché local):', error);
+        onUpdate(getStoredComments(reportId));
+      }
+    );
+    return unsubscribe;
+  } catch (err) {
+    console.warn('No se pudo inicializar listener Firestore comentarios:', err);
+    onUpdate(getStoredComments(reportId));
+    return () => {};
+  }
+}
+
+/**
+ * Publica un nuevo comentario vecinal con persistencia en Cloud Firestore y localStorage
+ */
+export async function createCommentAction(
+  reportId: string,
+  data: {
+    author_name: string;
+    is_anonymous: boolean;
+    comment: string;
+    alsoSupport?: boolean;
+  }
+): Promise<ReportComment> {
+  const commentId = 'com_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 6);
+  const deviceId = getDeviceId();
+  const newComment: ReportComment = {
+    id: commentId,
+    report_id: reportId,
+    author_name: data.is_anonymous ? 'Vecina/o de Osorno (Anónimo)' : data.author_name.trim() || 'Vecino de Osorno',
+    is_anonymous: data.is_anonymous,
+    comment: data.comment.trim(),
+    created_at: new Date().toISOString(),
+    device_id: deviceId,
+  };
+
+  // 1. Guardar de inmediato en almacenamiento local para respuesta visual instantánea
+  const current = getStoredComments(reportId);
+  const updatedComments = [...current, newComment];
+  saveStoredComments(reportId, updatedComments);
+
+  // 2. Si marcó "Sumar mi apoyo", apoyar automáticamente si no lo había hecho
+  if (data.alsoSupport) {
+    const userSupports = getUserSupportedReportIds();
+    if (!userSupports.has(reportId)) {
+      await toggleSupportAction(reportId);
+    }
+  }
+
+  // 3. Persistir en Cloud Firestore
+  try {
+    await setDoc(doc(firestoreDb, 'comments', newComment.id), newComment);
+    try {
+      const reportRef = doc(firestoreDb, 'reports', reportId);
+      await updateDoc(reportRef, {
+        comments_count: increment(1),
+      });
+    } catch {}
+  } catch (err) {
+    console.error('Error guardando comentario en Firestore:', err);
+  }
+
+  return newComment;
+}
+

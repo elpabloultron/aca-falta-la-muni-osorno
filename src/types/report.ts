@@ -35,6 +35,17 @@ export interface Report {
   days_to_resolve?: number;
   flags_count?: number;
   is_hidden?: boolean;
+  comments_count?: number;
+}
+
+export interface ReportComment {
+  id: string;
+  report_id: string;
+  author_name: string;
+  is_anonymous: boolean;
+  comment: string;
+  created_at: string;
+  device_id?: string;
 }
 
 export interface CategoryInfo {
