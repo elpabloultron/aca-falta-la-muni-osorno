@@ -1,11 +1,11 @@
 Categories:
-  - System
-  - Connectivity
-  - Community
+  - Navigation
+  - Internet
+  - Location Tracker & Sharer
 License: AGPL-3.0-or-later
 AuthorName: Pablo Benavides Jorquera
 AuthorEmail: acafaltalamuniosorno@gmail.com
-AuthorWebSite: https://aca-falta-la-muni-osorno.web.app
+WebSite: https://aca-falta-la-muni-osorno.web.app
 SourceCode: https://github.com/elpabloultron/aca-falta-la-muni-osorno
 IssueTracker: https://github.com/elpabloultron/aca-falta-la-muni-osorno/issues
 
@@ -34,7 +34,8 @@ Builds:
       - yes
     output: app/build/outputs/apk/release/app-release-unsigned.apk
 
-AutoUpdateMode: Version v%v
+AutoUpdateMode: Version
 UpdateCheckMode: Tags
 CurrentVersion: 1.0.0
-CurrentCode: 1
+CurrentVersionCode: 1
+
