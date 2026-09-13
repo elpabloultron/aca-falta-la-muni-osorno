@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { StatsSummary } from '@/types/report';
+import { APP_VERSION } from '@/config/osorno';
 import { Plus, Flame, MapPin, ListFilter, AlertCircle, CheckCircle2, BarChart3, Smartphone } from 'lucide-react';
 
 interface HeaderStatsProps {
@@ -23,10 +24,10 @@ export const HeaderStats: React.FC<HeaderStatsProps> = ({
 }) => {
   return (
     <header className="pointer-events-none flex flex-col md:flex-row items-stretch md:items-center justify-between gap-1.5 sm:gap-2.5">
-      {/* Logotipo, Título Comunal y Métricas Rápidas */}
-      <div className="pointer-events-auto bg-[#141414]/92 backdrop-blur-md border border-white/10 rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 shadow-2xl flex items-center justify-between gap-2 sm:gap-4">
-        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#F4CA19] flex items-center justify-center text-black font-black text-base sm:text-lg shadow-md shrink-0">
+      {/* Barra Principal de Marca y Métricas */}
+      <div className="pointer-events-auto bg-[#18181A]/95 backdrop-blur-md border border-white/10 rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5 shadow-2xl flex items-center justify-between gap-2.5 sm:gap-4 flex-1">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#F4CA19] flex items-center justify-center text-black font-black text-base sm:text-lg shadow-lg shrink-0">
             !
           </div>
           <div className="min-w-0 truncate">
@@ -34,6 +35,9 @@ export const HeaderStats: React.FC<HeaderStatsProps> = ({
               <span className="truncate">ACÁ FALTA LA MUNI</span>
               <span className="text-[9px] sm:text-[10px] bg-[#F4CA19]/15 text-[#F4CA19] font-bold px-1.5 py-0.5 rounded border border-[#F4CA19]/30 shrink-0">
                 OSORNO
+              </span>
+              <span className="text-[9px] sm:text-[10px] font-mono bg-white/10 text-neutral-300 font-semibold px-1.5 py-0.5 rounded border border-white/10 shrink-0">
+                {APP_VERSION}
               </span>
             </h1>
             <p className="text-neutral-400 text-[10px] sm:text-[11px] font-medium truncate mt-0.5">

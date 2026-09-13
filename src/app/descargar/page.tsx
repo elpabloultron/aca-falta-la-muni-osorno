@@ -22,6 +22,7 @@ import {
   Play,
   Share2,
 } from 'lucide-react';
+import { APP_VERSION } from '@/config/osorno';
 
 export default function DescargarPage() {
   const [activeTab, setActiveTab] = useState<'android' | 'ios' | 'pc'>('android');
@@ -86,6 +87,9 @@ export default function DescargarPage() {
             <span className="ml-2 text-[10px] bg-[#F4CA19]/15 text-[#F4CA19] font-bold px-1.5 py-0.5 rounded border border-[#F4CA19]/30">
               OSORNO
             </span>
+            <span className="ml-1.5 text-[10px] font-mono bg-white/10 text-neutral-300 font-semibold px-1.5 py-0.5 rounded border border-white/10">
+              {APP_VERSION}
+            </span>
           </div>
         </div>
 
@@ -109,7 +113,7 @@ export default function DescargarPage() {
         <div className="relative z-10 text-center max-w-3xl mx-auto space-y-6">
           <div className="inline-flex items-center gap-2 bg-[#F4CA19]/10 border border-[#F4CA19]/30 text-[#F4CA19] text-xs font-black uppercase tracking-wider px-3.5 py-1.5 rounded-full">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Plataforma Vecinal Oficial Osorno</span>
+            <span>Plataforma Vecinal Oficial Osorno • {APP_VERSION}</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight leading-[1.15]">
@@ -502,6 +506,10 @@ export default function DescargarPage() {
             </a>
           </div>
           <div className="pt-3 border-t border-white/5 flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[11px] text-neutral-500">
+            <span className="font-mono text-[10px] bg-white/5 text-neutral-400 px-1.5 py-0.5 rounded border border-white/10 font-medium">
+              {APP_VERSION}
+            </span>
+            <span className="hidden sm:inline text-neutral-700">·</span>
             <span>Autor: <strong className="text-neutral-400 font-semibold">Pablo Benavides Jorquera</strong></span>
             <span className="hidden sm:inline text-neutral-700">·</span>
             <span>Contacto: <a href="mailto:acafaltalamuniosorno@gmail.com" className="text-neutral-400 hover:text-[#F4CA19] hover:underline transition-colors">acafaltalamuniosorno@gmail.com</a></span>

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Report } from '@/types/report';
-import { CATEGORIAS_REPORTE } from '@/config/osorno';
+import { CATEGORIAS_REPORTE, APP_VERSION } from '@/config/osorno';
 import {
   ThumbsUp,
   MapPin,
@@ -249,14 +249,22 @@ export const ReportFeedView: React.FC<ReportFeedViewProps> = ({
           <p className="text-neutral-400">
             «Acá Falta la Muni — Osorno» · Iniciativa ciudadana independiente
           </p>
-          <p>
-            Autor: <strong className="text-neutral-300 font-medium">Pablo Benavides Jorquera</strong> · Contacto:{' '}
-            <a
-              href="mailto:acafaltalamuniosorno@gmail.com"
-              className="text-neutral-400 hover:text-[#F4CA19] hover:underline transition-colors"
-            >
-              acafaltalamuniosorno@gmail.com
-            </a>
+          <p className="flex items-center justify-center gap-1.5 flex-wrap">
+            <span className="font-mono text-[10px] bg-white/5 text-neutral-400 px-1.5 py-0.5 rounded border border-white/10 font-medium">
+              {APP_VERSION}
+            </span>
+            <span>·</span>
+            <span>Autor: <strong className="text-neutral-300 font-medium">Pablo Benavides Jorquera</strong></span>
+            <span>·</span>
+            <span>
+              Contacto:{' '}
+              <a
+                href="mailto:acafaltalamuniosorno@gmail.com"
+                className="text-neutral-400 hover:text-[#F4CA19] hover:underline transition-colors"
+              >
+                acafaltalamuniosorno@gmail.com
+              </a>
+            </span>
           </p>
         </footer>
 

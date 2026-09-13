@@ -6,8 +6,11 @@ export const OSORNO_CENTER = {
   zoom: 12,
 };
 
+export const APP_VERSION = 'v1.0.0';
+
 export const APP_METADATA = {
   name: 'Acá Falta la Muni — Osorno',
+  version: APP_VERSION,
   author: 'Pablo Benavides Jorquera',
   contactEmail: 'acafaltalamuniosorno@gmail.com',
   city: 'Osorno',

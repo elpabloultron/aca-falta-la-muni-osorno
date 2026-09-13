@@ -20,7 +20,7 @@ import { ReportFeedView } from '@/components/Feed/ReportFeedView';
 import { TopUnresolvedWidget } from '@/components/HUD/TopUnresolvedWidget';
 import { MunicipalAnalyticsModal } from '@/components/Analytics/MunicipalAnalyticsModal';
 import { InstallAppModal } from '@/components/PWA/InstallAppModal';
-import { OSORNO_CENTER } from '@/config/osorno';
+import { OSORNO_CENTER, APP_VERSION } from '@/config/osorno';
 import { MapPin } from 'lucide-react';
 
 // Carga dinámica de Leaflet para aislar ejecución del lado del cliente
@@ -258,6 +258,9 @@ export default function HomePage() {
           aria-label="Créditos y contacto del autor"
           className="fixed bottom-2 left-3 z-20 pointer-events-auto flex items-center gap-1.5 text-[10px] text-neutral-400/80 hover:text-neutral-200 bg-[#141414]/75 hover:bg-[#141414]/95 backdrop-blur-xs px-2.5 py-1 rounded-md border border-white/5 transition-all shadow-sm"
         >
+          <span className="font-mono text-[9px] bg-white/10 text-neutral-300 font-semibold px-1.5 py-0.5 rounded border border-white/10">
+            {APP_VERSION}
+          </span>
           <span>Por <strong className="text-neutral-300 font-medium">Pablo Benavides Jorquera</strong></span>
           <span className="text-neutral-600">·</span>
           <a
