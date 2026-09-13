@@ -8,7 +8,7 @@ interface StoreBadgeProps {
 
 // 1. Insignia Oficial de GitHub Releases (APK Directo)
 export const GitHubBadge: React.FC<{ href?: string; onClick?: () => void }> = ({
-  href = 'https://github.com/pablobenavidesj/aca-falta-la-muni-osorno/releases',
+  href = 'https://github.com/elpabloultron/aca-falta-la-muni-osorno/releases',
   onClick,
 }) => (
   <a
@@ -69,7 +69,7 @@ export const FDroidBadge: React.FC<{ href?: string; onClick?: () => void }> = ({
 
 // 3. Insignia Oficial de Obtainium (Actualizaciones Automáticas Directas)
 export const ObtainiumBadge: React.FC<{ href?: string; onClick?: () => void }> = ({
-  href = 'obtainium://app/https://github.com/pablobenavidesj/aca-falta-la-muni-osorno',
+  href = 'obtainium://app/https://github.com/elpabloultron/aca-falta-la-muni-osorno',
   onClick,
 }) => (
   <a

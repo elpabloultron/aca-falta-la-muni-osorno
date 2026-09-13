@@ -11,6 +11,8 @@ jobs:
   build-apk:
     name: Compilar APK Android (Release & Debug)
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Clonar repositorio

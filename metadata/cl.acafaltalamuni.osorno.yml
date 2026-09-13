@@ -6,8 +6,8 @@ License: AGPL-3.0-or-later
 AuthorName: Pablo Benavides Jorquera
 AuthorEmail: acafaltalamuniosorno@gmail.com
 AuthorWebSite: https://aca-falta-la-muni-osorno.web.app
-SourceCode: https://github.com/pablobenavidesj/aca-falta-la-muni-osorno
-IssueTracker: https://github.com/pablobenavidesj/aca-falta-la-muni-osorno/issues
+SourceCode: https://github.com/elpabloultron/aca-falta-la-muni-osorno
+IssueTracker: https://github.com/elpabloultron/aca-falta-la-muni-osorno/issues
 
 AutoName: Acá Falta la Muni — Osorno
 Summary: Fiscalización comunitaria y reclamos ciudadanos en Osorno, Chile
@@ -23,7 +23,7 @@ Description: |-
   - 100 % libre de rastreo y publicidad.
 
 RepoType: git
-Repo: https://github.com/pablobenavidesj/aca-falta-la-muni-osorno.git
+Repo: https://github.com/elpabloultron/aca-falta-la-muni-osorno.git
 
 Builds:
   - versionName: 1.0.0

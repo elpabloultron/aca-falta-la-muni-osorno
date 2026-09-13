@@ -529,7 +529,7 @@ export default function DescargarPage() {
               <div className="pt-5 mt-4 border-t border-white/5 flex flex-col gap-2.5">
                 <GitHubBadge />
                 <a
-                  href="https://github.com/pablobenavidesj/aca-falta-la-muni-osorno"
+                  href="https://github.com/elpabloultron/aca-falta-la-muni-osorno"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-center text-[11px] text-neutral-400 hover:text-white hover:underline transition-colors"
@@ -711,7 +711,7 @@ export default function DescargarPage() {
               </p>
             </div>
             <a
-              href="https://github.com/pablobenavidesj/aca-falta-la-muni-osorno"
+              href="https://github.com/elpabloultron/aca-falta-la-muni-osorno"
               target="_blank"
               rel="noopener noreferrer"
               className="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-2 transition-colors shrink-0 border border-white/10 cursor-pointer"
@@ -799,7 +799,7 @@ export default function DescargarPage() {
             </a>
             <span>•</span>
             <a
-              href="https://github.com/pablobenavidesj/aca-falta-la-muni-osorno"
+              href="https://github.com/elpabloultron/aca-falta-la-muni-osorno"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:underline flex items-center gap-1"
