@@ -31,6 +31,7 @@ import {
   GitHubBadge,
   FDroidBadge,
   ObtainiumBadge,
+  DirectApkBadge,
 } from '@/components/Badges/OfficialStoreBadges';
 
 export default function DescargarPage() {
@@ -162,12 +163,14 @@ export default function DescargarPage() {
             </a>
           </div>
 
-          {/* Fila rápida de acceso Open Source (GitHub, Obtainium y F-Droid) */}
+          {/* Fila rápida de acceso Open Source (GitHub, Obtainium, F-Droid y APK Directo) */}
           <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5">
             <GitHubBadge />
             <ObtainiumBadge />
             <FDroidBadge />
+            <DirectApkBadge />
           </div>
+
 
           <div className="pt-4 flex items-center justify-center gap-6 text-xs text-neutral-400">
             <span className="flex items-center gap-1.5">
@@ -492,183 +495,252 @@ export default function DescargarPage() {
               <GitHubBadge />
               <ObtainiumBadge />
               <FDroidBadge />
+              <DirectApkBadge />
             </div>
           </div>
 
-          {/* Cuadrícula de Canales Open Source (3 Columnas) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {/* 1. GitHub Releases & APK Directo */}
-            <div className="bg-[#18181D] border border-white/10 rounded-2xl p-5 flex flex-col justify-between hover:border-[#F4CA19]/40 transition-colors shadow-lg group">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-white/10 text-white flex items-center justify-center font-black">
-                    <Code2 className="w-5 h-5 text-[#F4CA19]" />
+          {/* Los 4 Grandes Banners FOSS (Obtainium, F-Droid, APK Directo y GitHub) */}
+          <div className="space-y-6">
+            {/* Banner 1: Obtainium (Actualizaciones Automáticas Directas) */}
+            <div className="relative overflow-hidden bg-gradient-to-br from-[#1d0b38] via-[#140826] to-[#0d0519] border-2 border-purple-500/40 hover:border-purple-400/80 rounded-3xl p-6 sm:p-8 shadow-2xl transition-all duration-300 group">
+              <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
+                <div className="space-y-3.5 text-center lg:text-left max-w-2xl">
+                  <div className="inline-flex items-center gap-2 bg-purple-500/20 border border-purple-400/40 text-purple-300 text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full">
+                    <RefreshCw className="w-3.5 h-3.5 text-purple-300 animate-spin-slow" />
+                    <span>1 Toque · Auto-Update FOSS</span>
                   </div>
-                  <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30">
-                    v1.0.0 Oficial
-                  </span>
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-white group-hover:text-[#F4CA19] transition-colors">
-                    GitHub Releases (APK)
+
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white leading-tight">
+                    Obtainium: Actualizaciones automáticas directas sin tiendas
                   </h3>
-                  <p className="text-neutral-400 text-xs mt-1.5 leading-relaxed">
-                    Descarga directa del paquete APK firmado oficial, compilado directamente desde el repositorio público. Código 100 % auditable, sin rastreadores ni publicidad.
+
+                  <p className="text-neutral-300 text-xs sm:text-sm leading-relaxed">
+                    Instala «Acá Falta la Muni — Osorno» en tu teléfono Android directamente desde el repositorio oficial. Obtainium monitorea las nuevas versiones y te notifica para actualizar con un solo toque, con 0 % de rastreo y total independencia de Google Play o tiendas comerciales cerradas.
                   </p>
+
+                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 pt-1 text-xs">
+                    <span className="bg-black/60 border border-purple-500/30 px-3 py-1 rounded-xl text-purple-200 font-mono flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-purple-400" />
+                      ID: cl.acafaltalamuni.osorno
+                    </span>
+                    <span className="bg-white/10 px-2.5 py-1 rounded-xl text-neutral-300 font-semibold">
+                      0 % Rastreadores
+                    </span>
+                    <span className="bg-white/10 px-2.5 py-1 rounded-xl text-neutral-300 font-semibold">
+                      Directo desde GitHub Releases
+                    </span>
+                  </div>
                 </div>
-              </div>
-              <div className="pt-5 mt-4 border-t border-white/5 flex flex-col gap-2.5">
-                <GitHubBadge />
-                <a
-                  href="https://github.com/elpabloultron/aca-falta-la-muni-osorno/releases"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-center text-[11px] text-neutral-400 hover:text-white hover:underline transition-colors"
-                >
-                  Ver Releases y notas de versión en GitHub →
-                </a>
+
+                <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto shrink-0">
+                  <a
+                    href="obtainium://app/https://github.com/elpabloultron/aca-falta-la-muni-osorno"
+                    className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xl shadow-purple-900/30 transition-all cursor-pointer active:scale-95 text-center"
+                  >
+                    <RefreshCw className="w-4 h-4 text-purple-200" />
+                    <span>Añadir a Obtainium en 1 Toque</span>
+                  </a>
+
+                  <a
+                    href="https://github.com/ImranR98/Obtainium"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white font-semibold text-xs flex items-center justify-center gap-2 border border-purple-500/30 transition-all cursor-pointer text-center"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-purple-400" />
+                    <span>¿Qué es Obtainium? Descargar gestor</span>
+                  </a>
+                </div>
               </div>
             </div>
 
-            {/* 2. Obtainium (Actualizaciones Automáticas sin Tiendas) */}
-            <div className="bg-[#18181D] border border-white/10 rounded-2xl p-5 flex flex-col justify-between hover:border-purple-500/40 transition-colors shadow-lg group">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-black">
-                    <RefreshCw className="w-5 h-5 text-purple-400" />
+            {/* Banner 2: F-Droid (Catálogo Oficial de Software Libre) */}
+            <div className="relative overflow-hidden bg-gradient-to-br from-[#091b2e] via-[#071626] to-[#040e1a] border-2 border-[#19B5FE]/40 hover:border-[#19B5FE]/80 rounded-3xl p-6 sm:p-8 shadow-2xl transition-all duration-300 group">
+              <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-72 h-72 bg-[#19B5FE]/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
+                <div className="space-y-3.5 text-center lg:text-left max-w-2xl">
+                  <div className="inline-flex items-center gap-2 bg-[#1976D2]/25 border border-[#19B5FE]/40 text-cyan-300 text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full">
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#19B5FE]" />
+                    <span>Catálogo Mundial FOSS · 100 % Libre</span>
                   </div>
-                  <span className="text-[10px] font-bold bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full border border-purple-500/30">
-                    Recomendado FOSS
-                  </span>
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-white group-hover:text-purple-300 transition-colors">
-                    Obtainium (Android)
+
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white leading-tight">
+                    F-Droid: El repositorio comunitario ético y soberano
                   </h3>
-                  <p className="text-neutral-400 text-xs mt-1.5 leading-relaxed">
-                    Instala la app directamente desde GitHub y recibe avisos de actualización en 1 toque en tu teléfono Android, sin pasar por Google ni tiendas propietarias.
+
+                  <p className="text-neutral-300 text-xs sm:text-sm leading-relaxed">
+                    El catálogo de software libre más respetado para Android. «Acá Falta la Muni — Osorno» dispone de su receta de compilación pública y transparente en el repositorio. Cero librerías de seguimiento corporativo, total privacidad ciudadana y código 100 % auditable.
                   </p>
+
+                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 pt-1 text-xs">
+                    <span className="bg-black/60 border border-[#19B5FE]/30 px-3 py-1 rounded-xl text-cyan-200 font-mono flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-cyan-400" />
+                      cl.acafaltalamuni.osorno.yml
+                    </span>
+                    <span className="bg-white/10 px-2.5 py-1 rounded-xl text-neutral-300 font-semibold">
+                      Licencia AGPL-3.0
+                    </span>
+                    <span className="bg-white/10 px-2.5 py-1 rounded-xl text-neutral-300 font-semibold">
+                      Sin Publicidad ni Telemetría
+                    </span>
+                  </div>
                 </div>
-              </div>
-              <div className="pt-5 mt-4 border-t border-white/5 flex flex-col gap-2.5">
-                <ObtainiumBadge />
-                <a
-                  href="https://github.com/ImranR98/Obtainium"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-center text-[11px] text-neutral-400 hover:text-white hover:underline transition-colors"
-                >
-                  ¿Qué es Obtainium? Descargar gestor libre →
-                </a>
+
+                <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto shrink-0">
+                  <a
+                    href="https://f-droid.org"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#1976D2] to-[#0288D1] hover:from-[#1565C0] hover:to-[#0277BD] text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xl shadow-cyan-950/40 transition-all cursor-pointer active:scale-95 text-center"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-cyan-200" />
+                    <span>Explorar en F-Droid Oficial</span>
+                  </a>
+
+                  <a
+                    href="https://github.com/elpabloultron/aca-falta-la-muni-osorno/blob/main/metadata/cl.acafaltalamuni.osorno.yml"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white font-semibold text-xs flex items-center justify-center gap-2 border border-[#19B5FE]/30 transition-all cursor-pointer text-center"
+                  >
+                    <FileText className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Ver Receta Metadata YAML</span>
+                  </a>
+                </div>
               </div>
             </div>
 
-            {/* 3. F-Droid (Catálogo Software Libre) */}
-            <div className="bg-[#18181D] border border-white/10 rounded-2xl p-5 flex flex-col justify-between hover:border-blue-500/40 transition-colors shadow-lg group">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center font-black">
-                    <ShieldCheck className="w-5 h-5 text-blue-400" />
+            {/* Banner 3: APK Directo (Paquete Firmado Oficial) */}
+            <div className="relative overflow-hidden bg-gradient-to-br from-[#082216] via-[#061c12] to-[#03110a] border-2 border-emerald-500/40 hover:border-emerald-400/80 rounded-3xl p-6 sm:p-8 shadow-2xl transition-all duration-300 group">
+              <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
+                <div className="space-y-3.5 text-center lg:text-left max-w-2xl">
+                  <div className="inline-flex items-center gap-2 bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full">
+                    <Download className="w-3.5 h-3.5 text-emerald-300" />
+                    <span>Paquete Firmado v1.0.0 · 9,8 MB</span>
                   </div>
-                  <span className="text-[10px] font-bold bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded-full border border-blue-500/30">
-                    FOSS · 100 % Libre
-                  </span>
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-white group-hover:text-blue-300 transition-colors">
-                    F-Droid (Android)
+
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white leading-tight">
+                    Descarga Directa de APK: Rápido, seguro e independiente
                   </h3>
-                  <p className="text-neutral-400 text-xs mt-1.5 leading-relaxed">
-                    El repositorio de software libre más respetado para Android. Cero librerías de seguimiento privativo, total privacidad y metadatos F-Droid configurados.
+
+                  <p className="text-neutral-300 text-xs sm:text-sm leading-relaxed">
+                    Descarga directamente el paquete oficial instalable `.apk` compilado para cualquier teléfono o tableta con Android 8.0 en adelante. Sin cuentas de correo obligatorias, sin registro de usuario y listo para usar en terreno para fiscalizar baches, basurales o luminarias.
                   </p>
+
+                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 pt-1 text-xs">
+                    <span className="bg-black/60 border border-emerald-500/30 px-3 py-1 rounded-xl text-emerald-200 font-mono flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                      AcAFaltaLaMuni-Osorno-v1.0.0.apk
+                    </span>
+                    <span className="bg-white/10 px-2.5 py-1 rounded-xl text-neutral-300 font-semibold">
+                      Android 8.0+
+                    </span>
+                    <span className="bg-white/10 px-2.5 py-1 rounded-xl text-neutral-300 font-semibold">
+                      Firma de Seguridad Oficial
+                    </span>
+                  </div>
                 </div>
-              </div>
-              <div className="pt-5 mt-4 border-t border-white/5 flex flex-col gap-2.5">
-                <FDroidBadge />
-                <a
-                  href="https://f-droid.org"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-center text-[11px] text-neutral-400 hover:text-white hover:underline transition-colors"
-                >
-                  Receta metadata F-Droid configurada →
-                </a>
+
+                <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto shrink-0">
+                  <a
+                    href="https://github.com/elpabloultron/aca-falta-la-muni-osorno/releases/download/v1.0.0/AcAFaltaLaMuni-Osorno-v1.0.0.apk"
+                    download="AcAFaltaLaMuni-Osorno-v1.0.0.apk"
+                    className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xl shadow-emerald-950/40 transition-all cursor-pointer active:scale-95 text-center"
+                  >
+                    <Download className="w-4 h-4 text-emerald-100" />
+                    <span>Descargar APK Directo (v1.0.0)</span>
+                  </a>
+
+                  <a
+                    href="https://github.com/elpabloultron/aca-falta-la-muni-osorno/releases"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white font-semibold text-xs flex items-center justify-center gap-2 border border-emerald-500/30 transition-all cursor-pointer text-center"
+                  >
+                    <Package className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Ver Notas de Versión y Hash SHA256</span>
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Gran Banner Oficial de GitHub y Proyecto Open Source */}
-          <div className="relative overflow-hidden bg-gradient-to-br from-neutral-900 via-[#16161B] to-neutral-900 border-2 border-[#F4CA19]/40 rounded-3xl p-6 sm:p-10 shadow-2xl">
-            <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-80 h-80 bg-[#F4CA19]/10 rounded-full blur-3xl pointer-events-none" />
-            <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
-              <div className="space-y-4 text-center lg:text-left max-w-2xl">
-                <div className="inline-flex items-center gap-2 bg-[#F4CA19]/15 border border-[#F4CA19]/40 text-[#F4CA19] text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full">
-                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-                  </svg>
-                  <span>Proyecto Comunitario en GitHub</span>
+            {/* Banner 4: GitHub Oficial & Espejo GitLab (Comunidad y Código Fuente) */}
+            <div className="relative overflow-hidden bg-gradient-to-br from-neutral-900 via-[#18181F] to-neutral-950 border-2 border-[#F4CA19]/40 hover:border-[#F4CA19]/80 rounded-3xl p-6 sm:p-8 shadow-2xl transition-all duration-300 group">
+              <div className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/4 w-72 h-72 bg-[#F4CA19]/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-6">
+                <div className="space-y-3.5 text-center lg:text-left max-w-2xl">
+                  <div className="inline-flex items-center gap-2 bg-[#F4CA19]/15 border border-[#F4CA19]/40 text-[#F4CA19] text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full">
+                    <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                      <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                    </svg>
+                    <span>Código Abierto · Licencia AGPL-3.0</span>
+                  </div>
+
+                  <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-white leading-tight">
+                    ¡Apóyanos con una estrella en GitHub y audita el código fuente!
+                  </h3>
+
+                  <p className="text-neutral-300 text-xs sm:text-sm leading-relaxed">
+                    «Acá Falta la Muni — Osorno» es una iniciativa 100 % independiente y de código abierto. Cualquier vecino, dirigente social o estudiante puede auditar el software, proponer mejoras o replicarlo en su propia comuna. Sincronizado en GitHub y en el espejo oficial de GitLab.
+                  </p>
+
+                  <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5 pt-1 text-xs">
+                    <span className="bg-black/60 border border-white/10 px-3 py-1 rounded-xl text-neutral-300 font-mono flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                      github.com/elpabloultron/aca-falta-la-muni-osorno
+                    </span>
+                    <span className="bg-white/10 px-2.5 py-1 rounded-xl text-neutral-300 font-semibold">
+                      Licencia AGPL-3.0
+                    </span>
+                    <span className="bg-white/10 px-2.5 py-1 rounded-xl text-neutral-300 font-semibold">
+                      Espejo GitLab Sincronizado
+                    </span>
+                  </div>
                 </div>
 
-                <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight">
-                  ¡Visita el repositorio oficial y apóyanos con una estrella en GitHub!
-                </h3>
+                <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto shrink-0">
+                  <a
+                    href="https://github.com/elpabloultron/aca-falta-la-muni-osorno"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-6 py-3.5 rounded-2xl bg-[#F4CA19] hover:bg-[#ffe14d] text-black font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xl shadow-yellow-500/20 transition-all cursor-pointer active:scale-95 text-center"
+                  >
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                      <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
+                    </svg>
+                    <span>Visitar Proyecto en GitHub ⭐</span>
+                  </a>
 
-                <p className="text-neutral-300 text-xs sm:text-sm leading-relaxed">
-                  «Acá Falta la Muni — Osorno» es una iniciativa 100 % independiente y de código abierto (licencia libre AGPL-3.0). El código fuente es público y auditable: cualquier vecino o desarrollador puede revisarlo, clonarlo, reportar problemas o proponer mejoras para la comuna.
-                </p>
+                  <a
+                    href="https://gitlab.com/elpabloultron/aca-falta-la-muni-osorno"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-3 rounded-2xl bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs flex items-center justify-center gap-2 border border-white/10 transition-all cursor-pointer text-center"
+                  >
+                    <svg className="w-4 h-4 text-[#fc6d26] fill-current" viewBox="0 0 24 24">
+                      <path d="M23.6 9.89l-.05-.12-3.25-8.23a.9.9 0 0 0-.86-.54.91.91 0 0 0-.86.56l-2.07 6.33H7.44L5.37 1.56a.91.91 0 0 0-.86-.56.9.9 0 0 0-.86.54L.4 9.77l-.05.12a5.9 5.9 0 0 0 2.08 6.84l.08.06 5.86 4.4 2.92 2.22a1.13 1.13 0 0 0 1.42 0l2.92-2.22 5.86-4.4.08-.06a5.9 5.9 0 0 0 2.08-6.84z"/>
+                    </svg>
+                    <span>Ver Espejo en GitLab 🦊</span>
+                  </a>
 
-                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 pt-1 text-xs">
-                  <span className="bg-black/60 border border-white/10 px-3 py-1 rounded-xl text-neutral-300 font-mono flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                    github.com/elpabloultron/aca-falta-la-muni-osorno
-                  </span>
-                  <span className="bg-white/10 px-2.5 py-1 rounded-xl text-neutral-300 font-semibold">
-                    Licencia AGPL-3.0
-                  </span>
-                  <span className="bg-white/10 px-2.5 py-1 rounded-xl text-neutral-300 font-semibold">
-                    0 % Rastreadores
-                  </span>
+                  <a
+                    href="https://github.com/elpabloultron/aca-falta-la-muni-osorno/issues"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-5 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer text-center"
+                  >
+                    <Code2 className="w-3.5 h-3.5 text-[#F4CA19]" />
+                    <span>Aportar Código o Reportar Fallos</span>
+                  </a>
                 </div>
-              </div>
-
-              {/* Botones de Acción del Banner */}
-              <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto shrink-0">
-                <a
-                  href="https://github.com/elpabloultron/aca-falta-la-muni-osorno"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-6 py-3.5 rounded-2xl bg-[#F4CA19] hover:bg-[#ffe14d] text-black font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xl shadow-yellow-500/20 transition-all cursor-pointer active:scale-95 text-center"
-                >
-                  <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                    <path fillRule="evenodd" clipRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" />
-                  </svg>
-                  <span>Visitar Proyecto en GitHub ⭐</span>
-                </a>
-
-                <a
-                  href="https://github.com/elpabloultron/aca-falta-la-muni-osorno/releases"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-5 py-3 rounded-2xl bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs flex items-center justify-center gap-2 border border-white/10 transition-all cursor-pointer text-center"
-                >
-                  <Package className="w-4 h-4 text-[#F4CA19]" />
-                  <span>Ver Releases y Descargar APK</span>
-                </a>
-
-                <a
-                  href="https://github.com/elpabloultron/aca-falta-la-muni-osorno/issues"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-5 py-2.5 rounded-2xl bg-white/5 hover:bg-white/10 text-neutral-300 hover:text-white font-semibold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer text-center"
-                >
-                  <Code2 className="w-3.5 h-3.5 text-[#F4CA19]" />
-                  <span>Aportar Código o Reportar Fallos</span>
-                </a>
               </div>
             </div>
           </div>
         </div>
       </section>
+
 
 
       {/* 6. Características Principales de Fiscalización */}

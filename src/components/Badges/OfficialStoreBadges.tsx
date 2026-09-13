@@ -94,6 +94,35 @@ export const ObtainiumBadge: React.FC<{ href?: string; onClick?: () => void }> =
   </a>
 );
 
+// 3.1 Insignia Oficial de APK Directo (Android)
+export const DirectApkBadge: React.FC<{ href?: string; onClick?: () => void }> = ({
+  href = 'https://github.com/elpabloultron/aca-falta-la-muni-osorno/releases/download/v1.0.0/AcAFaltaLaMuni-Osorno-v1.0.0.apk',
+  onClick,
+}) => (
+  <a
+    href={href}
+    download="AcAFaltaLaMuni-Osorno-v1.0.0.apk"
+    onClick={onClick}
+    className="group relative inline-flex items-center gap-3 px-4 py-2.5 bg-gradient-to-r from-[#064e3b] to-[#065f46] hover:from-[#047857] hover:to-[#059669] border border-emerald-500/50 hover:border-emerald-400 rounded-xl transition-all duration-200 shadow-md hover:shadow-emerald-500/20 active:scale-95 text-left select-none cursor-pointer"
+    title="Descargar archivo APK oficial firmado (v1.0.0, 9,8 MB)"
+  >
+    <div className="w-7 h-7 rounded-lg bg-emerald-400/20 flex items-center justify-center p-1 shrink-0 border border-emerald-300/40">
+      <svg className="w-full h-full text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+      </svg>
+    </div>
+    <div className="flex flex-col leading-tight">
+      <span className="text-[9px] uppercase tracking-wider text-emerald-200 font-bold">
+        DIRECTO · 9,8 MB
+      </span>
+      <span className="text-sm font-extrabold text-white group-hover:text-emerald-100 transition-colors">
+        Descargar APK
+      </span>
+    </div>
+  </a>
+);
+
+
 // 4. Insignia Oficial de Samsung Galaxy Store
 export const SamsungGalaxyStoreBadge: React.FC<{ href?: string; onClick?: () => void }> = ({
   href = 'https://galaxystore.samsung.com',

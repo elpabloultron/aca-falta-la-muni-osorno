@@ -289,9 +289,10 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClos
             onClick={onClose}
             className="text-xs font-bold text-[#F4CA19] hover:underline flex items-center gap-1"
           >
-            <span>Ver opciones de descarga (F-Droid, APK, Tiendas)</span>
+            <span>Ver opciones de descarga (Obtainium, F-Droid, APK y GitHub)</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
+
           <button
             type="button"
             onClick={onClose}

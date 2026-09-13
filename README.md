@@ -4,6 +4,7 @@
 
 [![Licencia](https://img.shields.io/badge/Licencia-AGPL--3.0-blue.svg?style=for-the-badge)](https://www.gnu.org/licenses/agpl-3.0.html)
 [![GitHub Stars](https://img.shields.io/github/stars/elpabloultron/aca-falta-la-muni-osorno?style=for-the-badge&logo=github&color=F4CA19)](https://github.com/elpabloultron/aca-falta-la-muni-osorno/stargazers)
+[![GitLab Mirror](https://img.shields.io/badge/GitLab_Espejo-En_L%C3%ADnea-E24329.svg?style=for-the-badge&logo=gitlab&logoColor=white)](https://gitlab.com/elpabloultron/aca-falta-la-muni-osorno)
 [![Versión](https://img.shields.io/badge/Versi%C3%B3n-v1.0.0-emerald.svg?style=for-the-badge&logo=android&logoColor=black)](https://github.com/elpabloultron/aca-falta-la-muni-osorno/releases/tag/v1.0.0)
 [![Firebase Hosting](https://img.shields.io/badge/Firebase_Hosting-En_Vivo-FFA611.svg?style=for-the-badge&logo=firebase&logoColor=black)](https://aca-falta-la-muni-osorno.web.app)
 [![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-En_Vivo-222222.svg?style=for-the-badge&logo=github&logoColor=white)](https://elpabloultron.github.io/aca-falta-la-muni-osorno/)
@@ -16,7 +17,7 @@
 Este proyecto se erige bajo la premisa de la **soberanía ciudadana, la transparencia total y la privacidad comunitaria**.  
 A diferencia de aplicaciones corporativas o municipales que imponen barreras, publicidad o rastreadores comerciales, **«Acá Falta la Muni — Osorno»**:
 - **Es 100 % Software Libre y de Código Abierto:** Su código es público, auditable y reutilizable bajo la licencia **GNU Affero General Public License v3.0 (AGPL-3.0)**.
-- **Canales de Distribución Éticos:** Se distribuye exclusivamente mediante canales libres y descentralizados (**F-Droid**, **Obtainium** y paquetes directos **APK** desde GitHub Releases). No depende de monopolios comerciales cerrados ni tiendas que censuran o retrasan actualizaciones comunitarias.
+- **Canales de Distribución Éticos:** Se distribuye exclusivamente mediante canales libres y descentralizados (**Obtainium**, **F-Droid**, paquetes directos **APK** y repositorios públicos en **GitHub** y **GitLab**). No depende de monopolios comerciales cerrados ni tiendas que censuran o retrasan actualizaciones comunitarias.
 - **Sin rastreadores ni publicidad comercial (0 % rastreo):** No recopila datos privados, no exige inicio de sesión forzoso con ClaveÚnica o RUT para ingresar reportes y respeta íntegramente la privacidad de los vecinos de la comuna.
 
 ```
@@ -24,7 +25,8 @@ A diferencia de aplicaciones corporativas o municipales que imponen barreras, pu
 │                                                                                  │
 │   ⭐ ¡APÓYANOS CON UNA ESTRELLA EN GITHUB Y AUDITA EL CÓDIGO FUENTE!             │
 │                                                                                  │
-│   Repositorio Oficial: https://github.com/elpabloultron/aca-falta-la-muni-osorno  │
+│   GitHub Oficial: https://github.com/elpabloultron/aca-falta-la-muni-osorno      │
+│   GitLab Espejo:  https://gitlab.com/elpabloultron/aca-falta-la-muni-osorno      │
 │                                                                                  │
 │   • Código Abierto AGPL-3.0   • 100 % Comunitario   • Sin Fines de Lucro         │
 │   • Abre incidencias, propone mejoras o replica esta app en tu propia comuna    │
@@ -40,9 +42,11 @@ A diferencia de aplicaciones corporativas o municipales que imponen barreras, pu
 | :--- | :--- | :--- |
 | 🌐 **Google Firebase Hosting** | [aca-falta-la-muni-osorno.web.app](https://aca-falta-la-muni-osorno.web.app) | Plataforma web principal y PWA de alta velocidad (producción en la nube) |
 | 🌐 **GitHub Pages (Espejo FOSS)** | [elpabloultron.github.io/aca-falta-la-muni-osorno/](https://elpabloultron.github.io/aca-falta-la-muni-osorno/) | Despliegue estático de código abierto sincronizado directamente con la rama `main` |
+| 🦊 **GitLab (Espejo Oficial)** | [gitlab.com/elpabloultron/aca-falta-la-muni-osorno](https://gitlab.com/elpabloultron/aca-falta-la-muni-osorno) | Repositorio git descentralizado de respaldo y compilación alternativa |
 | 📲 **Descarga Directa de APK** | [AcAFaltaLaMuni-Osorno-v1.0.0.apk](https://github.com/elpabloultron/aca-falta-la-muni-osorno/releases/download/v1.0.0/AcAFaltaLaMuni-Osorno-v1.0.0.apk) | Paquete APK de 9,8 MB firmado e instalable en cualquier teléfono Android |
 | 🔄 **Actualizaciones con Obtainium** | [Añadir a Obtainium](obtainium://app/https://github.com/elpabloultron/aca-falta-la-muni-osorno) | Actualizaciones automáticas directas desde las *releases* de GitHub sin intermediarios |
 | 📦 **Catálogo Libre F-Droid** | [`metadata/cl.acafaltalamuni.osorno.yml`](metadata/cl.acafaltalamuni.osorno.yml) | Metadatos y receta para su incorporación en el repositorio mundial de software libre |
+
 | 📹 **Video Tutorial (Redes Sociales)** | [`/descargar#tutorial`](https://aca-falta-la-muni-osorno.web.app/descargar#tutorial) | Instructivo en formato vertical (20 segundos) para capacitar a juntas vecinales |
 
 ---
