@@ -27,6 +27,15 @@ import {
   Layers,
 } from 'lucide-react';
 import { APP_VERSION } from '@/config/osorno';
+import {
+  GitHubBadge,
+  FDroidBadge,
+  ObtainiumBadge,
+  SamsungGalaxyStoreBadge,
+  HuaweiAppGalleryBadge,
+  GooglePlayBadge,
+  AppleAppStoreBadge,
+} from '@/components/Badges/OfficialStoreBadges';
 
 export default function DescargarPage() {
   const [activeTab, setActiveTab] = useState<'android' | 'ios' | 'pc'>('android');
@@ -154,6 +163,15 @@ export default function DescargarPage() {
               <Package className="w-4 h-4 text-[#F4CA19]" />
               <span>Tiendas y Descargas</span>
             </a>
+          </div>
+
+          {/* Fila rápida de acceso a tiendas en Hero */}
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5">
+            <GitHubBadge />
+            <ObtainiumBadge />
+            <FDroidBadge />
+            <SamsungGalaxyStoreBadge />
+            <HuaweiAppGalleryBadge />
           </div>
 
           <div className="pt-4 flex items-center justify-center gap-6 text-xs text-neutral-400">
@@ -458,6 +476,34 @@ export default function DescargarPage() {
             </p>
           </div>
 
+          {/* Fila de Insignias Oficiales de Tiendas */}
+          <div className="bg-[#18181D]/80 border border-white/10 rounded-3xl p-5 sm:p-7 backdrop-blur-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-4">
+              <div>
+                <h3 className="text-white font-black text-base sm:text-lg flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-[#F4CA19]" />
+                  <span>Descarga Directa en 1 Clic e Insignias Oficiales</span>
+                </h3>
+                <p className="text-neutral-400 text-xs mt-0.5">
+                  Toca la insignia oficial de tu tienda o sistema para acceder a la descarga de la app nativa
+                </p>
+              </div>
+              <span className="text-[11px] font-mono bg-[#F4CA19]/10 text-[#F4CA19] font-bold px-2.5 py-1 rounded-full border border-[#F4CA19]/30 self-start sm:self-auto">
+                ID: cl.acafaltalamuni.osorno
+              </span>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 pt-1">
+              <GitHubBadge />
+              <ObtainiumBadge />
+              <FDroidBadge />
+              <SamsungGalaxyStoreBadge />
+              <HuaweiAppGalleryBadge />
+              <GooglePlayBadge isUpcoming={true} />
+              <AppleAppStoreBadge isUpcoming={true} />
+            </div>
+          </div>
+
           {/* Cuadrícula de Canales y Tiendas */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {/* 1. GitHub Releases & APK Directo */}
@@ -468,7 +514,7 @@ export default function DescargarPage() {
                     <Code2 className="w-5 h-5 text-[#F4CA19]" />
                   </div>
                   <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30">
-                    v1.0.0 Disponible
+                    v1.0.0 Oficial
                   </span>
                 </div>
                 <div>
@@ -480,23 +526,15 @@ export default function DescargarPage() {
                   </p>
                 </div>
               </div>
-              <div className="pt-5 mt-4 border-t border-white/5 flex flex-col gap-2">
-                <a
-                  href="https://github.com/pablobenavidesj/aca-falta-la-muni-osorno/releases"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-2.5 px-3 bg-[#F4CA19] hover:bg-[#ffe043] text-black font-black text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Descargar APK Oficial</span>
-                </a>
+              <div className="pt-5 mt-4 border-t border-white/5 flex flex-col gap-2.5">
+                <GitHubBadge />
                 <a
                   href="https://github.com/pablobenavidesj/aca-falta-la-muni-osorno"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-center text-[11px] text-neutral-400 hover:text-white hover:underline transition-colors"
                 >
-                  Ver código fuente en GitHub →
+                  Ver código fuente y Releases en GitHub →
                 </a>
               </div>
             </div>
@@ -521,14 +559,8 @@ export default function DescargarPage() {
                   </p>
                 </div>
               </div>
-              <div className="pt-5 mt-4 border-t border-white/5 flex flex-col gap-2">
-                <a
-                  href="obtainium://app/https://github.com/pablobenavidesj/aca-falta-la-muni-osorno"
-                  className="w-full py-2.5 px-3 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 transition-all shadow-md cursor-pointer"
-                >
-                  <RefreshCw className="w-3.5 h-3.5" />
-                  <span>Añadir a Obtainium</span>
-                </a>
+              <div className="pt-5 mt-4 border-t border-white/5 flex flex-col gap-2.5">
+                <ObtainiumBadge />
                 <a
                   href="https://github.com/ImranR98/Obtainium"
                   target="_blank"
@@ -560,18 +592,15 @@ export default function DescargarPage() {
                   </p>
                 </div>
               </div>
-              <div className="pt-5 mt-4 border-t border-white/5 flex flex-col gap-2">
-                <div className="py-2.5 px-3 bg-neutral-900 border border-white/10 text-neutral-300 font-medium text-xs rounded-xl flex items-center justify-center gap-1.5 text-center">
-                  <Clock className="w-3.5 h-3.5 text-blue-400" />
-                  <span>En proceso de indexación</span>
-                </div>
+              <div className="pt-5 mt-4 border-t border-white/5 flex flex-col gap-2.5">
+                <FDroidBadge />
                 <a
                   href="https://f-droid.org"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-center text-[11px] text-neutral-400 hover:text-white hover:underline transition-colors"
                 >
-                  Conocer catálogo oficial F-Droid →
+                  Receta metadata F-Droid configurada →
                 </a>
               </div>
             </div>
@@ -596,11 +625,11 @@ export default function DescargarPage() {
                   </p>
                 </div>
               </div>
-              <div className="pt-5 mt-4 border-t border-white/5">
-                <div className="py-2.5 px-3 bg-neutral-900 border border-white/10 text-neutral-300 font-medium text-xs rounded-xl flex items-center justify-center gap-1.5 text-center">
-                  <Clock className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>En proceso de publicación</span>
-                </div>
+              <div className="pt-5 mt-4 border-t border-white/5 flex flex-col gap-2.5">
+                <SamsungGalaxyStoreBadge />
+                <span className="text-center text-[11px] text-neutral-400">
+                  Abre la tienda oficial Galaxy Store en tu Samsung
+                </span>
               </div>
             </div>
 
@@ -624,11 +653,11 @@ export default function DescargarPage() {
                   </p>
                 </div>
               </div>
-              <div className="pt-5 mt-4 border-t border-white/5">
-                <div className="py-2.5 px-3 bg-neutral-900 border border-white/10 text-neutral-300 font-medium text-xs rounded-xl flex items-center justify-center gap-1.5 text-center">
-                  <Clock className="w-3.5 h-3.5 text-red-400" />
-                  <span>En proceso de publicación</span>
-                </div>
+              <div className="pt-5 mt-4 border-t border-white/5 flex flex-col gap-2.5">
+                <HuaweiAppGalleryBadge />
+                <span className="text-center text-[11px] text-neutral-400">
+                  Abre la tienda oficial AppGallery en tu Huawei
+                </span>
               </div>
             </div>
 
@@ -652,14 +681,14 @@ export default function DescargarPage() {
                   </p>
                 </div>
               </div>
-              <div className="pt-5 mt-4 border-t border-white/5 space-y-2">
-                <div className="py-2.5 px-3 bg-neutral-900 border border-white/10 text-neutral-300 font-medium text-xs rounded-xl flex items-center justify-center gap-1.5 text-center">
-                  <Clock className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Próximamente en Play Store e iOS</span>
+              <div className="pt-5 mt-4 border-t border-white/5 flex flex-col gap-2.5">
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <GooglePlayBadge isUpcoming={true} />
+                  <AppleAppStoreBadge isUpcoming={true} />
                 </div>
                 <a
                   href="#instalar"
-                  className="block text-center text-[11px] text-[#F4CA19] hover:underline"
+                  className="block text-center text-[11px] text-[#F4CA19] hover:underline pt-1"
                 >
                   ¡Instala hoy gratis en tu celular con la PWA! ↑
                 </a>
