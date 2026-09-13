@@ -11,6 +11,7 @@ import {
   resolveReportAction,
   getStoredReports,
   getUserSupportedReportIds,
+  subscribeToFirestoreReports,
 } from '@/lib/storage';
 import { HeaderStats } from '@/components/HUD/HeaderStats';
 import { CategoryFilters } from '@/components/HUD/CategoryFilters';
@@ -56,18 +57,17 @@ export default function HomePage() {
   const [selectedStatus, setSelectedStatus] = useState<ReportStatus | 'todos'>('todos');
   const [selectedSector, setSelectedSector] = useState<string | 'todos'>('todos');
 
-  // Inicializar reportes sincronizados con SQLite y apoyos locales
+  // Inicializar reportes sincronizados con Cloud Firestore y apoyos locales
   useEffect(() => {
     // 1. Mostrar de inmediato la caché local rápida
     const local = getStoredReports();
     setReports(local);
     setUserSupportedIds(getUserSupportedReportIds());
 
-    // 2. Sincronizar en segundo plano con la base de datos relacional SQLite
-    fetchReportsFromApi().then((serverData) => {
-      if (serverData && serverData.length > 0) {
-        setReports(serverData);
-      }
+    // 2. Suscripción reactiva en tiempo real a la base de datos central Cloud Firestore
+    const unsubscribeFirestore = subscribeToFirestoreReports((cloudReports) => {
+      setReports(cloudReports);
+      setUserSupportedIds(getUserSupportedReportIds());
     });
 
     // Detectar si la URL contiene un reporte específico (?reporte=xxx) o invitación (?descargar=1)
@@ -104,6 +104,7 @@ export default function HomePage() {
 
     window.addEventListener('osorno-reports-changed', handleReportsChanged);
     return () => {
+      unsubscribeFirestore();
       window.removeEventListener('osorno-reports-changed', handleReportsChanged);
     };
   }, []);

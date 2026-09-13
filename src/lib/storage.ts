@@ -1,6 +1,18 @@
 import { Report, ReportCategory, StatsSummary, MunicipalBehaviorStats, CategoryStat, SectorStat } from '@/types/report';
 import { CATEGORIAS_REPORTE } from '@/config/osorno';
 import { calculateDaysElapsed, isSectorRural } from './geo-utils';
+import { firestoreDb } from './firebase';
+import {
+  collection,
+  onSnapshot,
+  query,
+  orderBy,
+  doc,
+  setDoc,
+  updateDoc,
+  increment,
+  getDocs,
+} from 'firebase/firestore';
 
 const FLAGS_KEY = 'aca_falta_la_muni_osorno_user_flags_v2';
 
@@ -83,12 +95,66 @@ export function saveStoredReports(reports: Report[]): void {
   }
 }
 
+/**
+ * Suscripción reactiva en tiempo real a las denuncias en Cloud Firestore.
+ * Sincroniza instantáneamente cualquier denuncia, apoyo o cambio de estado entre todos los vecinos.
+ */
+export function subscribeToFirestoreReports(onUpdate: (reports: Report[]) => void): () => void {
+  if (typeof window === 'undefined') return () => {};
+  try {
+    const q = query(collection(firestoreDb, 'reports'), orderBy('created_at', 'desc'));
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const cloudReports: Report[] = [];
+        snapshot.forEach((docSnap) => {
+          cloudReports.push(docSnap.data() as Report);
+        });
+        if (cloudReports.length > 0) {
+          saveStoredReports(cloudReports);
+          onUpdate(cloudReports);
+        }
+      },
+      (error) => {
+        console.warn('Listener Firestore desconectado (usando caché local):', error);
+      }
+    );
+    return unsubscribe;
+  } catch (err) {
+    console.warn('No se pudo inicializar listener Firestore:', err);
+    return () => {};
+  }
+}
+
 export async function fetchReportsFromApi(): Promise<Report[]> {
+  if (typeof window === 'undefined') return getStoredReports();
+  try {
+    const q = query(collection(firestoreDb, 'reports'), orderBy('created_at', 'desc'));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const list: Report[] = [];
+      snap.forEach((d) => list.push(d.data() as Report));
+      saveStoredReports(list);
+      return list;
+    }
+  } catch (err) {
+    console.warn('Error sincronizando con Firestore:', err);
+  }
   return getStoredReports();
 }
 
+function sanitizeReportForFirestore(report: Partial<Report>): Record<string, any> {
+  const clean: Record<string, any> = {};
+  for (const [k, v] of Object.entries(report)) {
+    if (v !== undefined) {
+      clean[k] = v;
+    }
+  }
+  return clean;
+}
+
 /**
- * Crea nuevo reporte y actualiza estado local
+ * Crea nuevo reporte, guarda en caché local y persiste en Cloud Firestore
  */
 export async function createReportAction(
   data: Omit<Report, 'id' | 'created_at' | 'updated_at' | 'support_count' | 'status' | 'days_unresolved' | 'days_to_resolve'>
@@ -104,24 +170,35 @@ export async function createReportAction(
     is_rural: data.is_rural ?? isSectorRural(data.sector),
   };
 
-  const updatedReports = [newReport, ...getStoredReports()];
+  // 1. Guardar de inmediato en almacenamiento local para respuesta instantánea en pantalla
+  const current = getStoredReports();
+  const updatedReports = [newReport, ...current.filter((r) => r.id !== newReport.id)];
   saveStoredReports(updatedReports);
 
   const userSupports = getUserSupportedReportIds();
   userSupports.add(newReport.id);
   saveUserSupportedReportIds(userSupports);
 
+  // 2. Persistir en la base de datos central Cloud Firestore
+  try {
+    const payload = sanitizeReportForFirestore(newReport);
+    await setDoc(doc(firestoreDb, 'reports', newReport.id), payload);
+  } catch (err) {
+    console.error('Error guardando denuncia en Firestore:', err);
+  }
+
   return newReport;
 }
 
 /**
- * Alterna apoyo cívico (+1)
+ * Alterna apoyo cívico (+1) con persistencia local y atómica en Cloud Firestore
  */
 export async function toggleSupportAction(
   reportId: string
 ): Promise<{ supported: boolean; newCount: number }> {
   const userSupports = getUserSupportedReportIds();
   const wasSupported = userSupports.has(reportId);
+  const deviceId = getDeviceId();
 
   let newCount = 0;
   const reports = getStoredReports().map((rep) => {
@@ -141,19 +218,37 @@ export async function toggleSupportAction(
   saveStoredReports(reports);
   saveUserSupportedReportIds(userSupports);
 
+  // Sincronizar apoyo cívico en Cloud Firestore
+  try {
+    const reportRef = doc(firestoreDb, 'reports', reportId);
+    const supportRef = doc(firestoreDb, 'supports', `${reportId}_${deviceId}`);
+    if (wasSupported) {
+      await updateDoc(reportRef, { support_count: increment(-1) });
+    } else {
+      await updateDoc(reportRef, { support_count: increment(1) });
+      await setDoc(supportRef, {
+        report_id: reportId,
+        device_id: deviceId,
+        created_at: new Date().toISOString(),
+      });
+    }
+  } catch (err) {
+    console.warn('Error sincronizando apoyo en Firestore:', err);
+  }
+
   return { supported: !wasSupported, newCount };
 }
 
 /**
- * Marca como resuelto con evidencia fotográfica
+ * Marca como resuelto con evidencia fotográfica en caché local y Cloud Firestore
  */
 export async function resolveReportAction(
   reportId: string,
   resolvedImageUrl?: string
 ): Promise<boolean> {
+  const nowIso = new Date().toISOString();
   const reports = getStoredReports().map((rep) => {
     if (rep.id === reportId) {
-      const nowIso = new Date().toISOString();
       const days = calculateDaysElapsed(rep.created_at, nowIso);
       return {
         ...rep,
@@ -168,6 +263,19 @@ export async function resolveReportAction(
   });
 
   saveStoredReports(reports);
+
+  // Sincronizar resolución en Cloud Firestore
+  try {
+    const reportRef = doc(firestoreDb, 'reports', reportId);
+    await updateDoc(reportRef, {
+      status: 'resuelto',
+      resolved_at: nowIso,
+      ...(resolvedImageUrl ? { resolved_image_url: resolvedImageUrl } : {}),
+    });
+  } catch (err) {
+    console.warn('Error registrando resolución en Firestore:', err);
+  }
+
   return true;
 }
 
@@ -281,6 +389,24 @@ export async function flagReportAction(
   });
 
   saveStoredReports(reports);
+
+  // Sincronizar moderación comunitaria en Cloud Firestore
+  try {
+    const reportRef = doc(firestoreDb, 'reports', reportId);
+    await updateDoc(reportRef, {
+      flags_count: increment(1),
+      is_hidden: isHidden,
+    });
+    const flagRef = doc(firestoreDb, 'moderation_flags', `${reportId}_${getDeviceId()}`);
+    await setDoc(flagRef, {
+      report_id: reportId,
+      device_id: getDeviceId(),
+      reason: _reason || 'Comunitario',
+      created_at: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.warn('Error sincronizando moderación en Firestore:', err);
+  }
 
   return {
     success: true,
