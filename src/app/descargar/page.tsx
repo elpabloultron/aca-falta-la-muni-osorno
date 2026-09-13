@@ -626,13 +626,13 @@ export default function DescargarPage() {
 
                 <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto shrink-0">
                   <a
-                    href="https://f-droid.org"
+                    href="https://gitlab.com/fdroid/fdroiddata/-/merge_requests/48806"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-[#1976D2] to-[#0288D1] hover:from-[#1565C0] hover:to-[#0277BD] text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xl shadow-cyan-950/40 transition-all cursor-pointer active:scale-95 text-center"
                   >
                     <ShieldCheck className="w-4 h-4 text-cyan-200" />
-                    <span>Explorar en F-Droid Oficial</span>
+                    <span>Ver Solicitud F-Droid (MR !48806)</span>
                   </a>
 
                   <a
@@ -644,6 +644,7 @@ export default function DescargarPage() {
                     <FileText className="w-3.5 h-3.5 text-cyan-400" />
                     <span>Ver Receta Metadata YAML</span>
                   </a>
+
                 </div>
               </div>
             </div>
