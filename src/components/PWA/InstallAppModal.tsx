@@ -19,9 +19,14 @@ import Link from 'next/link';
 interface InstallAppModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpenFullDownloads?: () => void;
 }
 
-export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClose }) => {
+export const InstallAppModal: React.FC<InstallAppModalProps> = ({
+  isOpen,
+  onClose,
+  onOpenFullDownloads,
+}) => {
   const [platform, setPlatform] = useState<'ios' | 'android' | 'desktop'>('desktop');
   const [isStandalone, setIsStandalone] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -269,8 +274,76 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClos
             </div>
           )}
 
+          {/* Sección de Descargas Libres FOSS Rápidas */}
+          <div className="pt-2 border-t border-white/10 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-black text-white flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-[#F4CA19]" />
+                <span>Opciones de Software Libre (Android)</span>
+              </span>
+              <span className="text-[10px] bg-purple-500/20 text-purple-300 font-bold px-1.5 py-0.5 rounded border border-purple-500/30">
+                0 % Rastreo
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <a
+                href="obtainium://app/https://github.com/elpabloultron/aca-falta-la-muni-osorno"
+                className="p-2.5 rounded-xl bg-purple-950/40 hover:bg-purple-900/60 border border-purple-500/30 text-left transition-all group cursor-pointer"
+                title="Añadir a Obtainium en 1 Toque"
+              >
+                <div className="text-[11px] font-black text-purple-200 group-hover:text-white flex items-center gap-1">
+                  <span className="w-2 h-2 rounded-full bg-purple-400" />
+                  <span>Obtainium (1 Toque)</span>
+                </div>
+                <p className="text-[10px] text-neutral-400 mt-0.5">Auto-updates directas</p>
+              </a>
+
+              <a
+                href="https://github.com/elpabloultron/aca-falta-la-muni-osorno/releases/download/v1.0.0/AcAFaltaLaMuni-Osorno-v1.0.0.apk"
+                download="AcAFaltaLaMuni-Osorno-v1.0.0.apk"
+                className="p-2.5 rounded-xl bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/30 text-left transition-all group cursor-pointer"
+                title="Descargar APK Oficial v1.0.0"
+              >
+                <div className="text-[11px] font-black text-emerald-200 group-hover:text-white flex items-center gap-1">
+                  <Download className="w-3 h-3 text-emerald-400" />
+                  <span>APK Directo</span>
+                </div>
+                <p className="text-[10px] text-neutral-400 mt-0.5">Paquete v1.0.0 (9,8 MB)</p>
+              </a>
+
+              <a
+                href="https://gitlab.com/fdroid/fdroiddata/-/merge_requests/48806"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2.5 rounded-xl bg-cyan-950/40 hover:bg-cyan-900/60 border border-cyan-500/30 text-left transition-all group cursor-pointer"
+                title="Ver Solicitud F-Droid MR !48806"
+              >
+                <div className="text-[11px] font-black text-cyan-200 group-hover:text-white flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-cyan-400" />
+                  <span>F-Droid Oficial</span>
+                </div>
+                <p className="text-[10px] text-neutral-400 mt-0.5">MR !48806 en revisión</p>
+              </a>
+
+              <a
+                href="https://github.com/elpabloultron/aca-falta-la-muni-osorno"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2.5 rounded-xl bg-neutral-900/80 hover:bg-neutral-800 border border-white/10 text-left transition-all group cursor-pointer"
+                title="Ver Repositorio GitHub"
+              >
+                <div className="text-[11px] font-black text-[#F4CA19] group-hover:text-yellow-300 flex items-center gap-1">
+                  <span>★</span>
+                  <span>GitHub Oficial</span>
+                </div>
+                <p className="text-[10px] text-neutral-400 mt-0.5">Licencia AGPL-3.0</p>
+              </a>
+            </div>
+          </div>
+
           {/* Ventajas de la Web App */}
-          <div className="grid grid-cols-2 gap-2 pt-2 text-[11px] text-neutral-300">
+          <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] text-neutral-300">
             <div className="flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>100 % Anónima y segura</span>
@@ -282,23 +355,37 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClos
           </div>
         </div>
 
-        {/* Pie del Modal con Enlace a la Landing Page */}
+        {/* Pie del Modal */}
         <div className="p-4 bg-[#141414] border-t border-white/10 flex items-center justify-between gap-3">
-          <Link
-            href="/descargar#tiendas"
-            onClick={onClose}
-            className="text-xs font-bold text-[#F4CA19] hover:underline flex items-center gap-1"
-          >
-            <span>Ver opciones de descarga (Obtainium, F-Droid, APK y GitHub)</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
+          {onOpenFullDownloads ? (
+            <button
+              type="button"
+              onClick={() => {
+                onClose();
+                onOpenFullDownloads();
+              }}
+              className="text-xs font-black text-[#F4CA19] hover:underline flex items-center gap-1 cursor-pointer text-left"
+            >
+              <span>Ver Centro de Descargas Completo</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          ) : (
+            <Link
+              href="/descargar#tiendas"
+              onClick={onClose}
+              className="text-xs font-black text-[#F4CA19] hover:underline flex items-center gap-1"
+            >
+              <span>Ver Centro de Descargas Completo</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          )}
 
           <button
             type="button"
             onClick={onClose}
             className="py-2 px-4 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-bold transition-colors cursor-pointer"
           >
-            Continuar en la web
+            Continuar en el mapa
           </button>
         </div>
       </div>

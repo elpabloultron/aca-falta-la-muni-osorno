@@ -21,6 +21,7 @@ import { ReportFeedView } from '@/components/Feed/ReportFeedView';
 import { TopUnresolvedWidget } from '@/components/HUD/TopUnresolvedWidget';
 import { MunicipalAnalyticsModal } from '@/components/Analytics/MunicipalAnalyticsModal';
 import { InstallAppModal } from '@/components/PWA/InstallAppModal';
+import { FossDownloadCenter } from '@/components/Downloads/FossDownloadCenter';
 import { OSORNO_CENTER, APP_VERSION } from '@/config/osorno';
 import { MapPin } from 'lucide-react';
 
@@ -52,7 +53,7 @@ export default function HomePage() {
   const [pickedCoords, setPickedCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   // Estados de vista y filtros
-  const [viewMode, setViewMode] = useState<'pines' | 'calor' | 'feed'>('pines');
+  const [viewMode, setViewMode] = useState<'pines' | 'calor' | 'feed' | 'descargas'>('pines');
   const [selectedCategory, setSelectedCategory] = useState<ReportCategory | 'todas'>('todas');
   const [selectedStatus, setSelectedStatus] = useState<ReportStatus | 'todos'>('todos');
   const [selectedSector, setSelectedSector] = useState<string | 'todos'>('todos');
@@ -70,7 +71,7 @@ export default function HomePage() {
       setUserSupportedIds(getUserSupportedReportIds());
     });
 
-    // Detectar si la URL contiene un reporte específico (?reporte=xxx) o invitación (?descargar=1)
+    // Detectar si la URL contiene un reporte específico (?reporte=xxx) o vista de descargas (?vista=descargas o ?descargar=1)
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const repId = params.get('reporte');
@@ -78,8 +79,9 @@ export default function HomePage() {
         const found = local.find((r) => r.id === repId);
         if (found) setSelectedReport(found);
       }
-      if (params.get('descargar') === '1' || params.get('app') === '1') {
-        setIsInstallModalOpen(true);
+      const vista = params.get('vista');
+      if (vista === 'descargas' || vista === 'app' || params.get('descargar') === '1' || params.get('app') === '1') {
+        setViewMode('descargas');
       } else {
         // En móviles, invitar a instalar en la primera visita con un ligero retraso no invasivo
         const dismissed = localStorage.getItem('osorno_install_prompt_dismissed_v1');
@@ -118,6 +120,22 @@ export default function HomePage() {
       return true;
     });
   }, [reports, selectedCategory, selectedStatus, selectedSector]);
+
+  // Cambiar modo de vista y sincronizar con la URL
+  const handleChangeViewMode = (mode: 'pines' | 'calor' | 'feed' | 'descargas') => {
+    setViewMode(mode);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (mode === 'descargas') {
+        url.searchParams.set('vista', 'descargas');
+      } else {
+        url.searchParams.delete('vista');
+        url.searchParams.delete('descargar');
+        url.searchParams.delete('app');
+      }
+      window.history.replaceState({}, '', url.toString());
+    }
+  };
 
   // Métricas agregadas
   const stats: StatsSummary = useMemo(() => {
@@ -198,42 +216,46 @@ export default function HomePage() {
   return (
     <main className="relative w-screen h-[100dvh] overflow-hidden bg-[#141414] select-none font-sans">
       {/* 1. Contenedor Superior Unificado (HUD Responsive Móvil y Escritorio) */}
-      <div className="absolute top-2 sm:top-3 left-2 sm:left-3 right-2 sm:right-3 z-30 pointer-events-none flex flex-col gap-1.5 sm:gap-2 max-w-7xl mx-auto">
-        <HeaderStats
-          stats={stats}
-          viewMode={viewMode}
-          onChangeViewMode={(mode) => setViewMode(mode)}
-          onOpenCreate={() => {
-            setPickedCoords(OSORNO_CENTER);
-            setIsCreatingReport(true);
-          }}
-          onOpenAnalytics={() => setIsAnalyticsOpen(true)}
-          onOpenInstall={() => setIsInstallModalOpen(true)}
-        />
-
-        {/* 2. Filtros de Categorías, Estados y Sectores (Urbano y Rural) */}
-        {viewMode !== 'feed' && (
-          <CategoryFilters
-            reports={reports}
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
-            selectedStatus={selectedStatus}
-            onSelectStatus={setSelectedStatus}
-            selectedSector={selectedSector}
-            onSelectSector={setSelectedSector}
+      {viewMode !== 'descargas' && (
+        <div className="absolute top-2 sm:top-3 left-2 sm:left-3 right-2 sm:right-3 z-30 pointer-events-none flex flex-col gap-1.5 sm:gap-2 max-w-7xl mx-auto">
+          <HeaderStats
+            stats={stats}
+            viewMode={viewMode}
+            onChangeViewMode={handleChangeViewMode}
+            onOpenCreate={() => {
+              setPickedCoords(OSORNO_CENTER);
+              setIsCreatingReport(true);
+            }}
+            onOpenAnalytics={() => setIsAnalyticsOpen(true)}
+            onOpenInstall={() => handleChangeViewMode('descargas')}
           />
-        )}
-      </div>
 
-      {/* 3. Área Principal: Mapa Interactivo o Muro Feed */}
+          {/* 2. Filtros de Categorías, Estados y Sectores (Urbano y Rural) */}
+          {viewMode !== 'feed' && (
+            <CategoryFilters
+              reports={reports}
+              selectedCategory={selectedCategory}
+              onSelectCategory={setSelectedCategory}
+              selectedStatus={selectedStatus}
+              onSelectStatus={setSelectedStatus}
+              selectedSector={selectedSector}
+              onSelectSector={setSelectedSector}
+            />
+          )}
+        </div>
+      )}
+
+      {/* 3. Área Principal: Mapa Interactivo, Muro Feed o Centro de Descargas FOSS */}
       <div className="w-full h-full z-0">
-        {viewMode === 'feed' ? (
+        {viewMode === 'descargas' ? (
+          <FossDownloadCenter onBackToMap={() => handleChangeViewMode('pines')} />
+        ) : viewMode === 'feed' ? (
           <ReportFeedView
             reports={filteredReports}
             userSupportedIds={userSupportedIds}
             onSelectReport={(rep) => setSelectedReport(rep)}
             onToggleSupport={handleToggleSupport}
-            onSwitchToMap={() => setViewMode('pines')}
+            onSwitchToMap={() => handleChangeViewMode('pines')}
           />
         ) : (
           <MapView
@@ -250,12 +272,12 @@ export default function HomePage() {
       </div>
 
       {/* 4. Widget Inferior Izquierdo: Top 10 Denuncias con Más Tiempo sin Solución */}
-      {viewMode !== 'feed' && (
+      {viewMode !== 'feed' && viewMode !== 'descargas' && (
         <TopUnresolvedWidget
           reports={reports}
           onSelectReport={(rep) => {
             setFocusedReport(rep);
-            setViewMode('pines');
+            handleChangeViewMode('pines');
           }}
           selectedReportId={focusedReport?.id || selectedReport?.id}
         />
@@ -300,7 +322,7 @@ export default function HomePage() {
       )}
 
       {/* 5. Crédito cívico discreto en la esquina inferior izquierda del mapa */}
-      {viewMode !== 'feed' && (
+      {viewMode !== 'feed' && viewMode !== 'descargas' && (
         <aside
           aria-label="Créditos y contacto del autor"
           className="fixed bottom-2 left-3 z-20 pointer-events-auto flex items-center gap-1.5 text-[10px] text-neutral-400/80 hover:text-neutral-200 bg-[#141414]/75 hover:bg-[#141414]/95 backdrop-blur-xs px-2.5 py-1 rounded-md border border-white/5 transition-all shadow-sm"
@@ -368,6 +390,10 @@ export default function HomePage() {
           if (typeof window !== 'undefined') {
             localStorage.setItem('osorno_install_prompt_dismissed_v1', 'true');
           }
+        }}
+        onOpenFullDownloads={() => {
+          setIsInstallModalOpen(false);
+          handleChangeViewMode('descargas');
         }}
       />
     </main>
