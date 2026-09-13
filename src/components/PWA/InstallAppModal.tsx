@@ -285,11 +285,11 @@ export const InstallAppModal: React.FC<InstallAppModalProps> = ({ isOpen, onClos
         {/* Pie del Modal con Enlace a la Landing Page */}
         <div className="p-4 bg-[#141414] border-t border-white/10 flex items-center justify-between gap-3">
           <Link
-            href="/descargar"
+            href="/descargar#tiendas"
             onClick={onClose}
             className="text-xs font-bold text-[#F4CA19] hover:underline flex items-center gap-1"
           >
-            <span>Ver página informativa</span>
+            <span>Ver opciones de descarga (F-Droid, APK, Tiendas)</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
           <button
