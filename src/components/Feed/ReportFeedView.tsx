@@ -244,6 +244,22 @@ export const ReportFeedView: React.FC<ReportFeedViewProps> = ({
           </div>
         )}
 
+        {/* Pie de página discreto con créditos y contacto */}
+        <footer className="mt-8 pt-6 pb-12 border-t border-white/5 text-center text-[11px] text-neutral-500 space-y-1">
+          <p className="text-neutral-400">
+            «Acá Falta la Muni — Osorno» · Iniciativa ciudadana independiente
+          </p>
+          <p>
+            Autor: <strong className="text-neutral-300 font-medium">Pablo Benavides Jorquera</strong> · Contacto:{' '}
+            <a
+              href="mailto:acafaltalamuniosorno@gmail.com"
+              className="text-neutral-400 hover:text-[#F4CA19] hover:underline transition-colors"
+            >
+              acafaltalamuniosorno@gmail.com
+            </a>
+          </p>
+        </footer>
+
         {/* Modal de Compartir en Redes Sociales */}
         {sharingReport && (
           <ShareModal

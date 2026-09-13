@@ -12,7 +12,8 @@ export const metadata: Metadata = {
   title: 'Acá falta la muni — Mapa de reclamos urbanos en Osorno',
   description:
     'Mapa interactivo y colaborativo de reclamos ciudadanos en Osorno, Chile. Reporta baches, luminarias, microbasurales y fallas urbanas en tu barrio.',
-  authors: [{ name: 'Comunidad de Osorno' }],
+  authors: [{ name: 'Pablo Benavides Jorquera' }],
+  creator: 'Pablo Benavides Jorquera',
   keywords: [
     'Osorno',
     'Acá falta la muni',

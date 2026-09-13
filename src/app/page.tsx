@@ -252,7 +252,25 @@ export default function HomePage() {
         />
       )}
 
-      {/* 5. Modal de Auditoría y Comportamiento Municipal */}
+      {/* 5. Crédito cívico discreto en la esquina inferior izquierda del mapa */}
+      {viewMode !== 'feed' && (
+        <aside
+          aria-label="Créditos y contacto del autor"
+          className="fixed bottom-2 left-3 z-20 pointer-events-auto flex items-center gap-1.5 text-[10px] text-neutral-400/80 hover:text-neutral-200 bg-[#141414]/75 hover:bg-[#141414]/95 backdrop-blur-xs px-2.5 py-1 rounded-md border border-white/5 transition-all shadow-sm"
+        >
+          <span>Por <strong className="text-neutral-300 font-medium">Pablo Benavides Jorquera</strong></span>
+          <span className="text-neutral-600">·</span>
+          <a
+            href="mailto:acafaltalamuniosorno@gmail.com"
+            className="text-neutral-400 hover:text-[#F4CA19] hover:underline transition-colors"
+            title="Contacto por correo electrónico"
+          >
+            acafaltalamuniosorno@gmail.com
+          </a>
+        </aside>
+      )}
+
+      {/* 6. Modal de Auditoría y Comportamiento Municipal */}
       {isAnalyticsOpen && (
         <MunicipalAnalyticsModal onClose={() => setIsAnalyticsOpen(false)} />
       )}

@@ -501,6 +501,11 @@ export default function DescargarPage() {
               Video Tutorial
             </a>
           </div>
+          <div className="pt-3 border-t border-white/5 flex flex-col sm:flex-row items-center justify-center gap-1.5 sm:gap-2 text-[11px] text-neutral-500">
+            <span>Autor: <strong className="text-neutral-400 font-semibold">Pablo Benavides Jorquera</strong></span>
+            <span className="hidden sm:inline text-neutral-700">·</span>
+            <span>Contacto: <a href="mailto:acafaltalamuniosorno@gmail.com" className="text-neutral-400 hover:text-[#F4CA19] hover:underline transition-colors">acafaltalamuniosorno@gmail.com</a></span>
+          </div>
           <p className="text-[11px] text-neutral-600">
             Osorno, Región de Los Lagos, Chile • Desarrollado con tecnología cívica abierta
           </p>

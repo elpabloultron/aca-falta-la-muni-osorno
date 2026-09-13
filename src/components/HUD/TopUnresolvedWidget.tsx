@@ -48,7 +48,7 @@ export const TopUnresolvedWidget: React.FC<TopUnresolvedWidgetProps> = ({
   return (
     <aside
       aria-label="Ranking de denuncias con más tiempo sin solución en Osorno"
-      className="fixed bottom-6 left-4 z-30 max-w-sm sm:max-w-md w-[calc(100vw-2rem)] select-none pointer-events-auto"
+      className="fixed bottom-9 left-3 sm:bottom-9 sm:left-3 z-30 max-w-sm sm:max-w-md w-[calc(100vw-2rem)] select-none pointer-events-auto"
     >
       <div className="bg-[#18181A]/95 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300">
         {/* Cabecera / Pestaña del Widget */}

@@ -6,6 +6,15 @@ export const OSORNO_CENTER = {
   zoom: 12,
 };
 
+export const APP_METADATA = {
+  name: 'Acá Falta la Muni — Osorno',
+  author: 'Pablo Benavides Jorquera',
+  contactEmail: 'acafaltalamuniosorno@gmail.com',
+  city: 'Osorno',
+  region: 'Región de Los Lagos',
+  country: 'Chile',
+} as const;
+
 // Límites geográficos totales que abarcan toda la comuna de Osorno (urbano + rural, 951 km²)
 export const OSORNO_BOUNDS: [[number, number], [number, number]] = [
   [-40.7500, -73.4500], // Suroeste (Rumbo a Curaco / Pichil / Río Negro)
