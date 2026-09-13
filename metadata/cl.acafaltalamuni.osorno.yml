@@ -1,7 +1,7 @@
 Categories:
-  - Navigation
   - Internet
   - Location Tracker & Sharer
+  - Navigation
 License: AGPL-3.0-or-later
 AuthorName: Pablo Benavides Jorquera
 AuthorEmail: acafaltalamuniosorno@gmail.com
@@ -9,13 +9,13 @@ WebSite: https://aca-falta-la-muni-osorno.web.app
 SourceCode: https://github.com/elpabloultron/aca-falta-la-muni-osorno
 IssueTracker: https://github.com/elpabloultron/aca-falta-la-muni-osorno/issues
 
-AutoName: Acá Falta la Muni — Osorno
+AutoName: Acá Falta la Muni
 Summary: Fiscalización comunitaria y reclamos ciudadanos en Osorno, Chile
 Description: |-
   Plataforma cívica independiente para que la comunidad de Osorno (Chile) reporte
   baches, fallas de luminarias públicas, microbasurales y socavones en los 951 km²
   de la comuna (tanto radio urbano como sectores rurales).
-  
+
   Características:
   - Mapa comunal en tiempo real con OpenStreetMap libre.
   - Contador de días de inacción municipal.
@@ -32,6 +32,9 @@ Builds:
     subdir: android
     gradle:
       - yes
+    prebuild:
+      - mkdir -p capacitor-cordova-android-plugins
+      - echo "ext { cdvMinSdkVersion = 24; cdvPluginPostBuildExtras = []; cordovaConfig = [:] }" > capacitor-cordova-android-plugins/cordova.variables.gradle
     output: app/build/outputs/apk/release/app-release-unsigned.apk
 
 AutoUpdateMode: Version
