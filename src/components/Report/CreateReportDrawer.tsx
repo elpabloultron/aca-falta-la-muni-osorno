@@ -21,6 +21,7 @@ import {
   isWithinOsornoBounds,
   reverseGeocodeOsorno,
   isSectorRural,
+  SECTOR_CENTROIDS,
 } from '@/lib/geo-utils';
 
 interface CreateReportDrawerProps {
@@ -61,7 +62,8 @@ export const CreateReportDrawer: React.FC<CreateReportDrawerProps> = ({
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [authorName, setAuthorName] = useState('');
   const [isAnonymous, setIsAnonymous] = useState(true);
-  const [honeypot, setHoneypot] = useState(''); // Anti-spam
+  const [formError, setFormError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [isLocating, setIsLocating] = useState(false);
   const [isCompressing, setIsCompressing] = useState(false);
@@ -90,18 +92,19 @@ export const CreateReportDrawer: React.FC<CreateReportDrawerProps> = ({
   // Botón "Usar mi ubicación GPS actual"
   const handleUseCurrentLocation = () => {
     if (!navigator.geolocation) {
-      alert('Tu navegador no soporta geolocalización.');
+      setFormError('Tu navegador no soporta geolocalización.');
       return;
     }
 
     setIsLocating(true);
+    setFormError(null);
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
 
         if (!isWithinOsornoBounds(lat, lng)) {
-          alert('Tu ubicación GPS detectada se encuentra fuera de la comuna de Osorno.');
+          setFormError('Tu ubicación GPS detectada está fuera del radio comunal de Osorno. Se utilizará el sector seleccionado.');
           setIsLocating(false);
           return;
         }
@@ -113,7 +116,7 @@ export const CreateReportDrawer: React.FC<CreateReportDrawerProps> = ({
         setIsLocating(false);
       },
       (err) => {
-        alert('No pudimos acceder a tu ubicación GPS: ' + err.message);
+        setFormError('No pudimos acceder a tu ubicación GPS (' + err.message + '). Puedes elegir el sector o calle manualmente.');
         setIsLocating(false);
       },
       { enableHighAccuracy: true, timeout: 8000 }
@@ -127,54 +130,60 @@ export const CreateReportDrawer: React.FC<CreateReportDrawerProps> = ({
 
     try {
       setIsCompressing(true);
-      const compressed = await compressImage(file, 1280, 0.82);
+      setFormError(null);
+      const compressed = await compressImage(file, 960, 0.72);
       const serverUrl = await uploadImageToServer(compressed);
       setImageUrl(serverUrl);
     } catch (err: any) {
-      alert(err.message || 'Error al procesar la fotografía.');
+      setFormError(err.message || 'Error al procesar la fotografía.');
     } finally {
       setIsCompressing(false);
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setFormError(null);
 
-    // Detección de trampa anti-spam (Honeypot)
-    if (honeypot) {
-      console.warn('Bot detectado.');
-      onClose();
+    const cleanTitle = title.trim();
+    if (!cleanTitle) {
+      setFormError('Por favor ingresa un título descriptivo para la denuncia.');
       return;
     }
 
-    if (!title.trim()) {
-      alert('Por favor ingresa un título descriptivo para el problema.');
+    const cleanDesc = description.trim();
+    if (!cleanDesc) {
+      setFormError('Por favor describe brevemente la problemática o sus consecuencias.');
       return;
     }
 
-    if (!description.trim()) {
-      alert('Por favor describe brevemente la problemática.');
-      return;
+    let finalCoords = coords;
+    // Si las coordenadas están fuera de Osorno, reasignar al centroide del sector para asegurar validez
+    if (!isWithinOsornoBounds(finalCoords.lat, finalCoords.lng)) {
+      const fallback = SECTOR_CENTROIDS[sector] || [OSORNO_CENTER.lat, OSORNO_CENTER.lng];
+      finalCoords = { lat: fallback[0], lng: fallback[1] };
     }
 
-    if (!isWithinOsornoBounds(coords.lat, coords.lng)) {
-      alert('Las coordenadas seleccionadas están fuera de la comuna de Osorno.');
-      return;
+    setIsSubmitting(true);
+    try {
+      await onSubmitReport({
+        title: cleanTitle,
+        description: cleanDesc,
+        category,
+        sector: sector || 'Centro',
+        is_rural: isSectorRural(sector),
+        address_reference: addressReference.trim() || 'Sector ' + sector,
+        latitude: finalCoords.lat,
+        longitude: finalCoords.lng,
+        image_url: imageUrl || undefined,
+        author_name: isAnonymous ? 'Vecino de Osorno (Anónimo)' : authorName.trim() || 'Vecino de Osorno',
+        is_anonymous: isAnonymous,
+      });
+    } catch (err: any) {
+      setFormError(err.message || 'Error al registrar la denuncia. Intenta nuevamente.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    onSubmitReport({
-      title: title.trim(),
-      description: description.trim(),
-      category,
-      sector: sector || 'Centro',
-      is_rural: isSectorRural(sector),
-      address_reference: addressReference.trim() || 'Sector ' + sector,
-      latitude: coords.lat,
-      longitude: coords.lng,
-      image_url: imageUrl || undefined,
-      author_name: isAnonymous ? 'Vecino de Osorno (Anónimo)' : authorName.trim() || 'Vecino de Osorno',
-      is_anonymous: isAnonymous,
-    });
   };
 
   return (
@@ -205,17 +214,6 @@ export const CreateReportDrawer: React.FC<CreateReportDrawerProps> = ({
 
         {/* Formulario con desplazamiento vertical */}
         <form onSubmit={handleSubmit} className="p-5 overflow-y-auto space-y-4">
-          {/* Honeypot invisible para atrapar bots */}
-          <input
-            type="text"
-            name="city_fake_check"
-            value={honeypot}
-            onChange={(e) => setHoneypot(e.target.value)}
-            style={{ display: 'none' }}
-            tabIndex={-1}
-            autoComplete="off"
-          />
-
           {/* Alerta de Duplicado Cercano (Estilo FixMyStreet) */}
           {nearbyDuplicate && (
             <div className="bg-amber-950/40 border border-[#F4CA19]/40 rounded-2xl p-3.5 space-y-2 animate-fadeIn">
@@ -304,7 +302,16 @@ export const CreateReportDrawer: React.FC<CreateReportDrawerProps> = ({
                 <label className="block text-neutral-400 text-[11px] mb-1">Sector / Barrio</label>
                 <select
                   value={sector}
-                  onChange={(e) => setSector(e.target.value)}
+                  onChange={(e) => {
+                    const newSector = e.target.value;
+                    setSector(newSector);
+                    if (formError) setFormError(null);
+                    const centroid = SECTOR_CENTROIDS[newSector];
+                    if (centroid) {
+                      setCoords({ lat: centroid[0], lng: centroid[1] });
+                      setAddressReference((prev) => (!prev || prev.startsWith('Sector ') ? `Sector ${newSector}` : prev));
+                    }
+                  }}
                   className="w-full bg-neutral-800 border border-neutral-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-[#F4CA19]"
                 >
                   <optgroup label="— Radio Urbano —" className="bg-[#1C1C1E] text-[#F4CA19] font-bold">
@@ -345,31 +352,49 @@ export const CreateReportDrawer: React.FC<CreateReportDrawerProps> = ({
           {/* 3. Título y Descripción */}
           <div className="space-y-3">
             <div>
-              <label className="block text-neutral-300 text-xs font-bold uppercase tracking-wider mb-1">
-                3. Título breve del problema
+              <label className="block text-neutral-300 text-xs font-bold uppercase tracking-wider mb-1 flex items-center justify-between">
+                <span>3. Título breve del problema</span>
+                {formError && !title.trim() && (
+                  <span className="text-rose-400 text-[10px] font-semibold lowercase">Requerido</span>
+                )}
               </label>
               <input
                 type="text"
                 maxLength={80}
                 placeholder="Ej. Cráter peligroso en cruce vehicular"
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-[#F4CA19]"
-                required
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  if (formError) setFormError(null);
+                }}
+                className={`w-full bg-neutral-900 border rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-neutral-500 focus:outline-none transition-colors ${
+                  formError && !title.trim()
+                    ? 'border-rose-500 ring-1 ring-rose-500/50 focus:border-rose-400'
+                    : 'border-neutral-700 focus:border-[#F4CA19]'
+                }`}
               />
             </div>
 
             <div>
-              <label className="block text-neutral-300 text-xs font-bold uppercase tracking-wider mb-1">
-                Detalle y consecuencias
+              <label className="block text-neutral-300 text-xs font-bold uppercase tracking-wider mb-1 flex items-center justify-between">
+                <span>Detalle y consecuencias</span>
+                {formError && !description.trim() && (
+                  <span className="text-rose-400 text-[10px] font-semibold lowercase">Requerido</span>
+                )}
               </label>
               <textarea
                 rows={3}
                 placeholder="Explica qué ocurre, desde cuándo y cómo afecta a los peatones o vehículos..."
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-3.5 py-2 text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-[#F4CA19] resize-none"
-                required
+                onChange={(e) => {
+                  setDescription(e.target.value);
+                  if (formError) setFormError(null);
+                }}
+                className={`w-full bg-neutral-900 border rounded-xl px-3.5 py-2 text-xs text-white placeholder-neutral-500 focus:outline-none transition-colors resize-none ${
+                  formError && !description.trim()
+                    ? 'border-rose-500 ring-1 ring-rose-500/50 focus:border-rose-400'
+                    : 'border-neutral-700 focus:border-[#F4CA19]'
+                }`}
               />
             </div>
           </div>
@@ -443,15 +468,37 @@ export const CreateReportDrawer: React.FC<CreateReportDrawerProps> = ({
             )}
           </div>
 
+          {/* Alerta visible si falta algún campo obligatorio */}
+          {formError && (
+            <div className="bg-rose-950/80 border border-rose-500/50 text-rose-200 text-xs p-3 rounded-xl flex items-center gap-2 animate-fadeIn">
+              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+              <span>{formError}</span>
+            </div>
+          )}
+
           {/* Botón de Envío Final */}
           <div className="pt-2">
             <button
               type="submit"
-              disabled={isCompressing}
-              className="w-full bg-[#F4CA19] hover:bg-[#ffe14d] text-black font-extrabold text-sm py-3.5 rounded-xl shadow-xl transition-all cursor-pointer flex items-center justify-center gap-2 active:scale-98"
+              disabled={isCompressing || isSubmitting}
+              className="w-full bg-[#F4CA19] hover:bg-[#ffe14d] active:scale-98 disabled:opacity-60 text-black font-black text-sm py-3.5 rounded-xl shadow-xl transition-all cursor-pointer flex items-center justify-center gap-2"
             >
-              <Check className="w-4 h-4 stroke-[3]" />
-              <span>Publicar reporte en el mapa de Osorno</span>
+              {isSubmitting ? (
+                <>
+                  <div className="w-4 h-4 rounded-full border-2 border-black border-t-transparent animate-spin" />
+                  <span>Publicando denuncia en el mapa...</span>
+                </>
+              ) : isCompressing ? (
+                <>
+                  <div className="w-4 h-4 rounded-full border-2 border-black border-t-transparent animate-spin" />
+                  <span>Comprimiendo fotografía...</span>
+                </>
+              ) : (
+                <>
+                  <Check className="w-4 h-4 stroke-[3]" />
+                  <span>Publicar reporte en el mapa de Osorno</span>
+                </>
+              )}
             </button>
           </div>
         </form>

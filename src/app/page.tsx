@@ -43,6 +43,8 @@ export default function HomePage() {
   const [reports, setReports] = useState<Report[]>([]);
   const [userSupportedIds, setUserSupportedIds] = useState<Set<string>>(new Set());
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const [focusedReport, setFocusedReport] = useState<Report | null>(null);
+  const [successToast, setSuccessToast] = useState<{ report: Report; message: string } | null>(null);
   const [isCreatingReport, setIsCreatingReport] = useState(false);
   const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
   const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
@@ -148,6 +150,15 @@ export default function HomePage() {
     }
   };
 
+  // Descartar automáticamente notificación toast de éxito tras 6 segundos
+  useEffect(() => {
+    if (!successToast) return;
+    const timer = setTimeout(() => {
+      setSuccessToast(null);
+    }, 6000);
+    return () => clearTimeout(timer);
+  }, [successToast]);
+
   // Clic en el mapa para situar o crear reporte
   const handleMapClick = (coords: { lat: number; lng: number }) => {
     if (isCreatingReport) {
@@ -158,14 +169,29 @@ export default function HomePage() {
     }
   };
 
-  // Publicar nuevo reporte en SQLite
+  // Publicar nuevo reporte y enfocar inmediatamente en el mapa
   const handleCreateReportSubmit = async (reportData: any) => {
     const created = await createReportAction(reportData);
-    setReports(getStoredReports());
+    const updated = getStoredReports();
+    setReports(updated);
     setUserSupportedIds(getUserSupportedReportIds());
     setIsCreatingReport(false);
     setPickedCoords(null);
-    setSelectedReport(created);
+
+    // Restablecer filtros para garantizar que el nuevo reporte sea visible de inmediato
+    setSelectedCategory('todas');
+    setSelectedStatus('todos');
+    setSelectedSector('todos');
+    setViewMode('pines');
+
+    // Centrar el mapa y desplegar la ventana emergente sobre el pin
+    setFocusedReport(created);
+
+    // Aviso confirmatorio amigable y no invasivo
+    setSuccessToast({
+      report: created,
+      message: '¡Denuncia publicada con éxito en el mapa de Osorno!',
+    });
   };
 
   return (
@@ -212,6 +238,7 @@ export default function HomePage() {
           <MapView
             reports={filteredReports}
             selectedReport={selectedReport}
+            focusedReport={focusedReport}
             selectedSector={selectedSector}
             onSelectReport={(rep) => setSelectedReport(rep)}
             viewMode={viewMode === 'calor' ? 'calor' : 'pines'}
@@ -221,35 +248,54 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* Mensaje de Estado Inicial Limpio cuando no hay denuncias registradas */}
-      {reports.length === 0 && viewMode !== 'feed' && !isCreatingReport && !selectedReport && (
-        <div className="pointer-events-none fixed inset-0 flex items-center justify-center p-4 z-20">
-          <div className="pointer-events-auto bg-[#141414]/92 backdrop-blur-md border border-white/10 rounded-2xl p-6 text-center max-w-sm shadow-2xl animate-fadeIn">
-            <div className="w-12 h-12 rounded-full bg-[#F4CA19]/20 text-[#F4CA19] flex items-center justify-center mx-auto mb-3">
-              <MapPin className="w-6 h-6" />
-            </div>
-            <h2 className="text-white font-black text-sm mb-1.5">El mapa de Osorno está listo</h2>
-            <p className="text-neutral-400 text-xs mb-4 leading-relaxed">
-              No hay denuncias de prueba registradas. Sé la primera persona en fiscalizar un problema en tu barrio o sector rural.
-            </p>
-            <button
-              type="button"
-              onClick={() => setIsCreatingReport(true)}
-              className="w-full bg-[#F4CA19] hover:bg-[#ffe043] text-black font-black text-xs py-2.5 px-4 rounded-xl shadow-lg transition-all cursor-pointer"
-            >
-              + Crear la primera denuncia
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* 4. Widget Inferior Izquierdo: Top 10 Denuncias con Más Tiempo sin Solución */}
       {viewMode !== 'feed' && (
         <TopUnresolvedWidget
           reports={reports}
-          onSelectReport={(rep) => setSelectedReport(rep)}
-          selectedReportId={selectedReport?.id}
+          onSelectReport={(rep) => {
+            setFocusedReport(rep);
+            setViewMode('pines');
+          }}
+          selectedReportId={focusedReport?.id || selectedReport?.id}
         />
+      )}
+
+      {/* Toast confirmatorio de denuncia publicada exitosamente */}
+      {successToast && (
+        <div className="fixed top-20 sm:top-24 left-1/2 -translate-x-1/2 z-40 max-w-md w-[calc(100vw-2rem)] bg-[#18181A]/95 border border-[#F4CA19] text-white p-3.5 rounded-2xl shadow-2xl backdrop-blur-md animate-fadeIn flex items-center justify-between gap-3 pointer-events-auto">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-[#F4CA19] text-black font-black flex items-center justify-center shrink-0 text-sm">
+              ✓
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-black text-[#F4CA19] truncate leading-tight">
+                {successToast.message}
+              </p>
+              <p className="text-[11px] text-neutral-300 truncate">
+                «{successToast.report.title}» en {successToast.report.sector}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                setSelectedReport(successToast.report);
+                setSuccessToast(null);
+              }}
+              className="bg-[#F4CA19] hover:bg-[#ffe043] text-black font-bold text-xs px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+            >
+              Ver ficha
+            </button>
+            <button
+              type="button"
+              onClick={() => setSuccessToast(null)}
+              className="text-neutral-400 hover:text-white p-1 rounded-lg text-xs cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
       )}
 
       {/* 5. Crédito cívico discreto en la esquina inferior izquierda del mapa */}

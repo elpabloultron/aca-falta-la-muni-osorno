@@ -69,6 +69,17 @@ export function saveStoredReports(reports: Report[]): void {
     window.dispatchEvent(new CustomEvent('osorno-reports-changed', { detail: reports }));
   } catch (err) {
     console.error('Error persistiendo reportes en localStorage:', err);
+    try {
+      // Resguardo defensivo ante cuota excedida: omitir base64 pesado para asegurar los datos cívicos
+      const lightweight = reports.map((r) => ({
+        ...r,
+        image_url: r.image_url && r.image_url.length > 35000 ? undefined : r.image_url,
+      }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(lightweight));
+      window.dispatchEvent(new CustomEvent('osorno-reports-changed', { detail: lightweight }));
+    } catch (quotaErr) {
+      console.error('Error crítico al intentar guardar versión reducida:', quotaErr);
+    }
   }
 }
 

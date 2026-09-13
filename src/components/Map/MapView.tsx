@@ -17,6 +17,7 @@ import { createHeatLayer } from './leaflet-heat';
 interface MapViewProps {
   reports: Report[];
   selectedReport: Report | null;
+  focusedReport?: Report | null;
   selectedSector?: string | 'todos';
   onSelectReport: (report: Report) => void;
   viewMode: 'pines' | 'calor';
@@ -27,6 +28,7 @@ interface MapViewProps {
 export const MapView: React.FC<MapViewProps> = ({
   reports,
   selectedReport,
+  focusedReport,
   selectedSector = 'todos',
   onSelectReport,
   viewMode,
@@ -341,23 +343,35 @@ export const MapView: React.FC<MapViewProps> = ({
         markersGroup.addLayer(marker);
         markersMapRef.current.set(rep.id, marker);
       });
-    }
-  }, [reports, selectedReport, viewMode, onSelectReport]);
 
-  // Centrar y abrir popup si hay un reporte seleccionado externamente
+      const activeTarget = focusedReport || selectedReport;
+      if (activeTarget) {
+        const marker = markersMapRef.current.get(activeTarget.id);
+        if (marker) {
+          marker.openPopup();
+        }
+      }
+    }
+  }, [reports, selectedReport, focusedReport, viewMode, onSelectReport]);
+
+  // Centrar y abrir popup si hay un reporte seleccionado o enfocado externamente
   useEffect(() => {
     const map = mapInstanceRef.current;
-    if (!map || !selectedReport) return;
+    const target = focusedReport || selectedReport;
+    if (!map || !target) return;
 
-    const marker = markersMapRef.current.get(selectedReport.id);
-    if (marker) {
-      marker.openPopup();
-    }
+    const timer = setTimeout(() => {
+      const marker = markersMapRef.current.get(target.id);
+      if (marker) {
+        marker.openPopup();
+      }
+      map.flyTo([target.latitude, target.longitude], 16, {
+        duration: 1.2,
+      });
+    }, 120);
 
-    map.flyTo([selectedReport.latitude, selectedReport.longitude], 16, {
-      duration: 1.2,
-    });
-  }, [selectedReport]);
+    return () => clearTimeout(timer);
+  }, [focusedReport, selectedReport]);
 
   return (
     <div className="relative w-full h-full">
