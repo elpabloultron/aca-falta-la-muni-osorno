@@ -44,3 +44,9 @@ next-env.d.ts
 
 # firebase
 .firebase/
+
+# android keystores and keys
+keystore/
+*.keystore
+*.jks
+*.p12
